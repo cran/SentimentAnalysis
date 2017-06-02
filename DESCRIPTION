@@ -1,0 +1,32 @@
+Package: SentimentAnalysis
+Type: Package
+Title: Dictionary-Based Sentiment Analysis
+Version: 1.2-0
+Date: 2017-06-01
+Authors@R: c(person("Stefan", "Feuerriegel", email="stefan.feuerriegel@is.uni-freiburg.de",
+                    role=c("aut", "cre")),
+             person("Nicolas", "Proellochs", email="nicolas.proellochs@is.uni-freiburg.de",
+                    role=c("aut")))
+Author: Stefan Feuerriegel [aut, cre],
+  Nicolas Proellochs [aut]
+Maintainer: Stefan Feuerriegel <stefan.feuerriegel@is.uni-freiburg.de>
+Description: Performs a sentiment analysis of textual contents in R. This implementation
+    utilizes various existing dictionaries, such as Harvard IV, or finance-specific 
+    dictionaries. Furthermore, it can also create customized dictionaries. The latter 
+    uses LASSO regularization as a statistical approach to select relevant terms based on 
+    an exogenous response variable. 
+License: MIT + file LICENSE
+URL: https://github.com/sfeuerriegel/SentimentAnalysis
+BugReports: https://github.com/sfeuerriegel/SentimentAnalysis/issues
+Depends: R (>= 2.10)
+Imports: tm (>= 0.6), qdapDictionaries, ngramrr (>= 0.1), moments,
+        stringdist, SnowballC, XML, glmnet, spikeslab (>= 1.1),
+        ggplot2, mgcv
+Suggests: testthat, knitr, rmarkdown
+LazyData: true
+RoxygenNote: 6.0.1
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2017-06-02 06:48:50 UTC; bwpc
+Repository: CRAN
+Date/Publication: 2017-06-02 07:12:37 UTC

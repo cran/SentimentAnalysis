@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Stefan Feuerriegel" />
+<meta name="author" content="Nicolas Proellochs" />
+
+<meta name="date" content="2017-06-02" />
+
+<title>SentimentAnalysis Vignette</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">SentimentAnalysis Vignette</h1>
+<h4 class="author"><em>Stefan Feuerriegel</em></h4>
+<h4 class="author"><em>Nicolas Proellochs</em></h4>
+<h4 class="date"><em>2017-06-02</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a><ul>
+<li><a href="#applications-in-research">Applications in research</a></li>
+<li><a href="#applications-in-practice">Applications in practice</a></li>
+</ul></li>
+<li><a href="#methods-for-sentiment-analysis">Methods for sentiment analysis</a></li>
+<li><a href="#setup-of-the-sentimentanalysis-package">Setup of the SentimentAnalysis package</a><ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#package-loading">Package loading</a></li>
+</ul></li>
+<li><a href="#brief-demonstration">Brief demonstration</a></li>
+<li><a href="#functionality">Functionality</a><ul>
+<li><a href="#interface">Interface</a><ul>
+<li><a href="#vector-of-strings">Vector of strings</a></li>
+<li><a href="#document-term-matrix">Document-term matrix</a></li>
+<li><a href="#corpus-object">Corpus object</a></li>
+</ul></li>
+<li><a href="#built-in-dictionaries">Built-in dictionaries</a></li>
+<li><a href="#dictionary-functions">Dictionary functions</a><ul>
+<li><a href="#sentimentdictionarywordlist">SentimentDictionaryWordlist</a></li>
+<li><a href="#sentimentdictionarybinary">SentimentDictionaryBinary</a></li>
+<li><a href="#sentimentdictionaryweighted">SentimentDictionaryWeighted</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#dictionary-generation">Dictionary generation</a><ul>
+<li><a href="#performance-evaluation">Performance evaluation</a></li>
+<li><a href="#configuration-of-preprocessing">Configuration of preprocessing</a></li>
+<li><a href="#performance-optimization">Performance optimization</a></li>
+<li><a href="#language-support-and-extensibility">Language support and extensibility</a></li>
+</ul></li>
+<li><a href="#worked-examples">Worked examples</a></li>
+<li><a href="#word-couting">Word couting</a></li>
+<li><a href="#outlook">Outlook</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<p>The <code>SentimentAnalysis</code> package introduces a powerful toolchain facilitating the sentiment analysis of textual contents in R. This implementation utilizes various existing dictionaries, such as General Inquirer, Harvard IV and Loughran-McDonald. Furthermore, it can also create customized dictionaries. The latter function uses LASSO regularization as a statistical approach to select relevant terms based on an exogenous response variable. Finally, all methods can be easility compared using built-in evaluation routines.</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Sentiment analysis is a research branch located at the heart of natural language processing (NLP), computational linguistics and text mining. It refers to any measures by which subjective information is extracted from textual documents. In other words, it extracts the polarity of the expressed opinion in a range spanning from positive to negative. As a result, one may also refer to sentiment analysis as <em>opinion mining</em> <span class="citation">(Pang and Lee 2008)</span>.</p>
+<div id="applications-in-research" class="section level2">
+<h2>Applications in research</h2>
+<p>Sentiment analysis has received great traction lately <span class="citation">(K. Ravi and Ravi 2015; Pang and Lee 2008)</span>, which we explore in the following. Current research in finance and the social sciences utilizes sentiment analysis to understand human decisions in response to textual materials. This immediately reveals manifold implications for practitioners, as well as those involved in the fields of finance research and the social sciences: researchers can use R to extract text components that are relevant for readers and test their hypotheses on this basis. By the same token, practitioners can measure which wording actually matters to their readership and enhance their writing accordingly <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2015)</span>. We demonstrate below the added benefits in two case studies drawn from finance and the social sciences.</p>
+</div>
+<div id="applications-in-practice" class="section level2">
+<h2>Applications in practice</h2>
+<p>Several applications demonstrate the uses of sentiment analysis for organizations and enterprises:</p>
+<ul>
+<li><p><strong>Finance:</strong> Investors in financial markets refer to textual information in the form of financial news disclosures before exercising ownership in stocks. Interestingly, they rely not only on quantitative numbers, but also soft information, such as tone and sentiment <span class="citation">(Henry 2008; Loughran and McDonald 2011; Tetlock 2007)</span>, which thereby strongly influences stock prices. By utilizing sentiment analysis, automated traders can automatically analyze the sentiment conveyed in financial disclosures in order to trigger investment decisions within milliseconds.</p></li>
+<li><p><strong>Marketing:</strong> Marketing departments are often interested in tracking brand image. For that purpose, they collect large volumes of user opinions from social media and evaluate the feelings of individuals towards brands, products and services. Practitioners in the field of marketing can exploit these insights to enhance their wording according to the feedback of their readership.</p></li>
+<li><p><strong>Rating and review platforms:</strong> Rating and review platforms fulfill a valuable function by collecting user ratings or preferences for certain products and services. Here, one can automatically process large volumes of user-generated content and exploit the knowledge gained thereby. For example, one can identify which cues convey a positive or negative opinion, or even automatically validate their credibility.</p></li>
+</ul>
+</div>
+</div>
+<div id="methods-for-sentiment-analysis" class="section level1">
+<h1>Methods for sentiment analysis</h1>
+<p>As sentiment analysis is applied to a broad variety of domains and textual sources, research has devised various approaches to measuring sentiment. A recent literature overview <span class="citation">(Pang and Lee 2008)</span> provides a comprehensive, domain-independent survey.</p>
+<p>On the one hand, machine learning approaches are preferred when one strives for high prediction performance. However, machine learning usually works as a black-box, thereby making interpretations diffucult. On the other hand, dictionary-based approaches generate lists of positive and negative words. The respective occurrences of these words are then combined into a single sentiment score. Therefore, the underlying decisions become traceable and researchers can understand the factors that result in a specific sentiment.</p>
+<p>In addition, <code>SentimentAnalysis</code> allows one to generate tailored dictionaries. These are customized to a specific domain, improve prediction performance compared to pure dictionaries and allow full interpretability. Details of this methodology can be found in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2015)</span>.</p>
+<p>In the process of performing sentiment analysis, one must convert the running text into a machine-readable format. This is achieved by executing a series of preprocessing operations. First, the text is tokenized into single words, followed by what are common preprocessing steps: stopword removal, stemming, removal of punctuation and conversion to lower-case. These operations are also conducted by default in <code>SentimentAnalysis</code>, but can be adapted to one’s personal needs.</p>
+</div>
+<div id="setup-of-the-sentimentanalysis-package" class="section level1">
+<h1>Setup of the SentimentAnalysis package</h1>
+<p>Even though sentiment analysis has received great traction lately, the available tools are not yet living up to the needs of researchers. The <code>SentimentAnalysis</code> package is intended to partially close this gap and offer capabilities that most research demands.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Using the <code>devtools</code> package, you can easily install the latest development version of <code>SentimentAnalysis</code> with</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
+
+<span class="co"># Option 1: download and install latest version from GitHub</span>
+<span class="kw">install_github</span>(<span class="st">&quot;sfeuerriegel/SentimentAnalysis&quot;</span>)
+
+<span class="co"># Option 2: install directly from bundled archive</span>
+<span class="kw">install_local</span>(<span class="st">&quot;SentimentAnalysis_1.1.0.tar.gz&quot;</span>)</code></pre></div>
+<p>Note: You have to specify the path either to the directory of <code>SentimentAnalysis</code> or to the bundled archive <code>SentimentAnalysis_1.1.0.tar.gz</code>.</p>
+</div>
+<div id="package-loading" class="section level2">
+<h2>Package loading</h2>
+<p>Afterwards, one merely needs to load the <code>SentimentAnalysis</code> package as follows. This section shows the basic functionality to crawl for ad hoc filings. The following lines extract the ad hoc disclosure that was published most recently.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(SentimentAnalysis)</code></pre></div>
+<pre><code>## 
+## Attaching package: 'SentimentAnalysis'</code></pre>
+<pre><code>## The following object is masked from 'package:base':
+## 
+##     write</code></pre>
+</div>
+</div>
+<div id="brief-demonstration" class="section level1">
+<h1>Brief demonstration</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Analyze a single string to obtain a binary response (positive / negative)</span>
+sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(<span class="st">&quot;Yeah, this was a great soccer game for the German team!&quot;</span>)
+<span class="kw">convertToBinaryResponse</span>(sentiment)$SentimentGI</code></pre></div>
+<pre><code>## [1] positive
+## Levels: negative positive</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a vector of strings</span>
+documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Wow, I really like the new light sabers!&quot;</span>,
+               <span class="st">&quot;That book was excellent.&quot;</span>,
+               <span class="st">&quot;R is a fantastic language.&quot;</span>,
+               <span class="st">&quot;The service in this restaurant was miserable.&quot;</span>,
+               <span class="st">&quot;This is neither positive or negative.&quot;</span>,
+               <span class="st">&quot;The waiter forget about my dessert -- what poor service!&quot;</span>)
+
+<span class="co"># Analyze sentiment</span>
+sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(documents)
+
+<span class="co"># Extract dictionary-based sentiment according to the Harvard-IV dictionary</span>
+sentiment$SentimentGI</code></pre></div>
+<pre><code>## [1]  0.3333333  0.5000000  0.5000000 -0.6666667  0.0000000 -0.6000000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># View sentiment direction (i.e. positive, neutral and negative)</span>
+<span class="kw">convertToDirection</span>(sentiment$SentimentGI)</code></pre></div>
+<pre><code>## [1] positive positive positive negative neutral  negative
+## Levels: negative neutral positive</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">response &lt;-<span class="st"> </span><span class="kw">c</span>(+<span class="dv">1</span>, +<span class="dv">1</span>, +<span class="dv">1</span>, -<span class="dv">1</span>, <span class="dv">0</span>, -<span class="dv">1</span>)
+
+<span class="kw">compareToResponse</span>(sentiment, response)</code></pre></div>
+<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
+<pre><code>## Warning in cor(x, y): the standard deviation is zero
+
+## Warning in cor(x, y): the standard deviation is zero</code></pre>
+<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
+<pre><code>##                              WordCount SentimentGI NegativityGI
+## cor                        -0.18569534   0.9900115  -0.99748901
+## cor.t.statistic            -0.37796447  14.0440465 -28.16913204
+## cor.p.value                -0.37796447  14.0440465 -28.16913204
+## lm.t.value                 -0.37796447  14.0440465 -28.16913204
+## r.squared                   0.03448276   0.9801228   0.99498433
+## RMSE                        3.82970843   0.4501029   1.18665418
+## MAE                         3.33333333   0.4000000   1.10000000
+## Accuracy                    0.66666667   1.0000000   0.66666667
+## Precision                          NaN   1.0000000          NaN
+## Sensitivity                 0.00000000   1.0000000   0.00000000
+## Specificity                 1.00000000   1.0000000   1.00000000
+## F1                          0.00000000   0.5000000   0.00000000
+## BalancedAccuracy            0.50000000   1.0000000   0.50000000
+## avg.sentiment.pos.response  3.25000000   0.3333333   0.08333333
+## avg.sentiment.neg.response  4.00000000  -0.6333333   0.63333333
+##                            PositivityGI SentimentHE NegativityHE
+## cor                           0.9429542   0.4152274 -0.083045480
+## cor.t.statistic               5.6647055   0.9128709 -0.166666667
+## cor.p.value                   5.6647055   0.9128709 -0.166666667
+## lm.t.value                    5.6647055   0.9128709 -0.166666667
+## r.squared                     0.8891626   0.1724138  0.006896552
+## RMSE                          0.7136240   0.8416254  0.922958207
+## MAE                           0.6666667   0.7500000  0.888888889
+## Accuracy                      0.6666667   0.6666667  0.666666667
+## Precision                           NaN         NaN          NaN
+## Sensitivity                   0.0000000   0.0000000  0.000000000
+## Specificity                   1.0000000   1.0000000  1.000000000
+## F1                            0.0000000   0.0000000  0.000000000
+## BalancedAccuracy              0.5000000   0.5000000  0.500000000
+## avg.sentiment.pos.response    0.4166667   0.1250000  0.083333333
+## avg.sentiment.neg.response    0.0000000   0.0000000  0.000000000
+##                            PositivityHE SentimentLM NegativityLM
+## cor                           0.3315938   0.7370455  -0.40804713
+## cor.t.statistic               0.7029595   2.1811142  -0.89389841
+## cor.p.value                   0.7029595   2.1811142  -0.89389841
+## lm.t.value                    0.7029595   2.1811142  -0.89389841
+## r.squared                     0.1099545   0.5432361   0.16650246
+## RMSE                          0.8525561   0.7234178   0.96186547
+## MAE                           0.8055556   0.6333333   0.92222222
+## Accuracy                      0.6666667   0.8333333   0.66666667
+## Precision                           NaN   1.0000000          NaN
+## Sensitivity                   0.0000000   0.5000000   0.00000000
+## Specificity                   1.0000000   1.0000000   1.00000000
+## F1                            0.0000000   0.3333333   0.00000000
+## BalancedAccuracy              0.5000000   0.7500000   0.50000000
+## avg.sentiment.pos.response    0.2083333   0.2500000   0.08333333
+## avg.sentiment.neg.response    0.0000000  -0.1000000   0.10000000
+##                            PositivityLM RatioUncertaintyLM SentimentQDAP
+## cor                           0.6305283                 NA     0.9865356
+## cor.t.statistic               1.6247248                 NA    12.0642877
+## cor.p.value                   1.6247248                 NA    12.0642877
+## lm.t.value                    1.6247248                 NA    12.0642877
+## r.squared                     0.3975659                 NA     0.9732526
+## RMSE                          0.7757911          0.9128709     0.5398902
+## MAE                           0.7222222          0.8333333     0.4888889
+## Accuracy                      0.6666667          0.6666667     1.0000000
+## Precision                           NaN                NaN     1.0000000
+## Sensitivity                   0.0000000          0.0000000     1.0000000
+## Specificity                   1.0000000          1.0000000     1.0000000
+## F1                            0.0000000          0.0000000     0.5000000
+## BalancedAccuracy              0.5000000          0.5000000     1.0000000
+## avg.sentiment.pos.response    0.3333333          0.0000000     0.3333333
+## avg.sentiment.neg.response    0.0000000          0.0000000    -0.3666667
+##                            NegativityQDAP PositivityQDAP
+## cor                           -0.94433955      0.9429542
+## cor.t.statistic               -5.74114834      5.6647055
+## cor.p.value                   -5.74114834      5.6647055
+## lm.t.value                    -5.74114834      5.6647055
+## r.squared                      0.89177719      0.8891626
+## RMSE                           1.06840137      0.7136240
+## MAE                            1.01111111      0.6666667
+## Accuracy                       0.66666667      0.6666667
+## Precision                             NaN            NaN
+## Sensitivity                    0.00000000      0.0000000
+## Specificity                    1.00000000      1.0000000
+## F1                             0.00000000      0.0000000
+## BalancedAccuracy               0.50000000      0.5000000
+## avg.sentiment.pos.response     0.08333333      0.4166667
+## avg.sentiment.neg.response     0.36666667      0.0000000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compareToResponse</span>(sentiment, <span class="kw">convertToBinaryResponse</span>(response))</code></pre></div>
+<pre><code>##                            WordCount SentimentGI NegativityGI PositivityGI
+## Accuracy                   0.6666667   1.0000000   0.66666667    0.6666667
+## Precision                        NaN   1.0000000          NaN          NaN
+## Sensitivity                0.0000000   1.0000000   0.00000000    0.0000000
+## Specificity                1.0000000   1.0000000   1.00000000    1.0000000
+## F1                         0.0000000   0.5000000   0.00000000    0.0000000
+## BalancedAccuracy           0.5000000   1.0000000   0.50000000    0.5000000
+## avg.sentiment.pos.response 3.2500000   0.3333333   0.08333333    0.4166667
+## avg.sentiment.neg.response 4.0000000  -0.6333333   0.63333333    0.0000000
+##                            SentimentHE NegativityHE PositivityHE
+## Accuracy                     0.6666667   0.66666667    0.6666667
+## Precision                          NaN          NaN          NaN
+## Sensitivity                  0.0000000   0.00000000    0.0000000
+## Specificity                  1.0000000   1.00000000    1.0000000
+## F1                           0.0000000   0.00000000    0.0000000
+## BalancedAccuracy             0.5000000   0.50000000    0.5000000
+## avg.sentiment.pos.response   0.1250000   0.08333333    0.2083333
+## avg.sentiment.neg.response   0.0000000   0.00000000    0.0000000
+##                            SentimentLM NegativityLM PositivityLM
+## Accuracy                     0.8333333   0.66666667    0.6666667
+## Precision                    1.0000000          NaN          NaN
+## Sensitivity                  0.5000000   0.00000000    0.0000000
+## Specificity                  1.0000000   1.00000000    1.0000000
+## F1                           0.3333333   0.00000000    0.0000000
+## BalancedAccuracy             0.7500000   0.50000000    0.5000000
+## avg.sentiment.pos.response   0.2500000   0.08333333    0.3333333
+## avg.sentiment.neg.response  -0.1000000   0.10000000    0.0000000
+##                            RatioUncertaintyLM SentimentQDAP NegativityQDAP
+## Accuracy                            0.6666667     1.0000000     0.66666667
+## Precision                                 NaN     1.0000000            NaN
+## Sensitivity                         0.0000000     1.0000000     0.00000000
+## Specificity                         1.0000000     1.0000000     1.00000000
+## F1                                  0.0000000     0.5000000     0.00000000
+## BalancedAccuracy                    0.5000000     1.0000000     0.50000000
+## avg.sentiment.pos.response          0.0000000     0.3333333     0.08333333
+## avg.sentiment.neg.response          0.0000000    -0.3666667     0.36666667
+##                            PositivityQDAP
+## Accuracy                        0.6666667
+## Precision                             NaN
+## Sensitivity                     0.0000000
+## Specificity                     1.0000000
+## F1                              0.0000000
+## BalancedAccuracy                0.5000000
+## avg.sentiment.pos.response      0.4166667
+## avg.sentiment.neg.response      0.0000000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(sentiment$SentimentGI, response)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The <code>SentimentAnalysis</code> package works very cleverly and neatly here in order to remove the effort for the user: it recognizes that the user has inserted a vector of strings and thus automatically performs a set of default preprocessing operations from text mining. Hence, it tokenizes each document and finally converts the input into a document-term matrix. All of the previous operations are undertaken without manual specification. The <code>analyzeSentiment()</code> routine also accepts other input formats in case the user has already performed a preprocessing step or wants to implement a specific set of operations.</p>
+</div>
+<div id="functionality" class="section level1">
+<h1>Functionality</h1>
+<p>The following sections present the functionality in terms of working with different input formats and the underlying dictionaries.</p>
+<div id="interface" class="section level2">
+<h2>Interface</h2>
+<p>The <code>SentimentAnalysis</code> package provides interfaces with several other input formats, among which are</p>
+<ul>
+<li><p>Vector of strings.</p></li>
+<li><p>DocumentTermMatrix and TermDocumentMatrix as implemented in the <code>tm</code> package <span class="citation">(Feinerer, Hornik, and Meyer 2008)</span>.</p></li>
+<li><p>Corpus object as implemented by the <code>tm</code> package <span class="citation">(Feinerer, Hornik, and Meyer 2008)</span>.</p></li>
+</ul>
+<p>We provide examples in the following.</p>
+<div id="vector-of-strings" class="section level3">
+<h3>Vector of strings</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;This is good&quot;</span>,
+               <span class="st">&quot;This is bad&quot;</span>,
+               <span class="st">&quot;This is inbetween&quot;</span>)
+<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(documents)$SentimentGI)</code></pre></div>
+<pre><code>## [1] positive negative neutral 
+## Levels: negative neutral positive</code></pre>
+</div>
+<div id="document-term-matrix" class="section level3">
+<h3>Document-term matrix</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tm)</code></pre></div>
+<pre><code>## Loading required package: NLP</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(<span class="kw">VectorSource</span>(documents))
+<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(corpus)$SentimentGI)</code></pre></div>
+<pre><code>## [1] positive negative neutral 
+## Levels: negative neutral positive</code></pre>
+</div>
+<div id="corpus-object" class="section level3">
+<h3>Corpus object</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtm &lt;-<span class="st"> </span><span class="kw">preprocessCorpus</span>(corpus)
+<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(dtm)$SentimentGI)</code></pre></div>
+<pre><code>## [1] positive negative neutral 
+## Levels: negative neutral positive</code></pre>
+<p>Since the package can work directly with a document-term matrix, this allows one to use customized preprocessing operations in the first place. Afterwards, one can utilize the <code>SentimentAnalysis</code> package for the computation of sentiment scores. For instance, one can replace the stopwords with those from a different list, or even perform tailored synonym merging, among other options. By default, the package uses the built-in routines <code>transformIntoCorpus()</code> to convert the input into a <code>Corpus</code> object and <code>preprocessCorpus()</code> to convert it into a <code>DocumentTermMatrix</code>.</p>
+</div>
+</div>
+<div id="built-in-dictionaries" class="section level2">
+<h2>Built-in dictionaries</h2>
+<p>The <code>SentimentAnalysis</code> package entails three different dictionaries:</p>
+<ul>
+<li><p>Harvard-IV dictionary as used in the General Inquirer program</p></li>
+<li><p>Henry’s Financial dictionary <span class="citation">(Henry 2008)</span></p></li>
+<li><p>Loughran-McDonald Financial dictionary <span class="citation">(Loughran and McDonald 2011)</span></p></li>
+</ul>
+<p>All of them can be manually inspected and even accessed as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Make dictionary available in the current R environment</span>
+<span class="kw">data</span>(DictionaryGI)
+<span class="co"># Display the internal structure </span>
+<span class="kw">str</span>(DictionaryGI)</code></pre></div>
+<pre><code>## List of 2
+##  $ negative: chr [1:2005] &quot;abandon&quot; &quot;abandonment&quot; &quot;abate&quot; &quot;abdicate&quot; ...
+##  $ positive: chr [1:1637] &quot;abide&quot; &quot;ability&quot; &quot;able&quot; &quot;abound&quot; ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Access dictionary as an object of type SentimentDictionary</span>
+dict.GI &lt;-<span class="st"> </span><span class="kw">loadDictionaryGI</span>()
+<span class="co"># Print summary statistics of dictionary</span>
+<span class="kw">summary</span>(dict.GI)</code></pre></div>
+<pre><code>## Dictionary type:  binary (positive / negative)
+## Total entries:    3062
+## Positive entries: 1316 (42.98%)
+## Negative entries: 1746 (57.02%)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(DictionaryHE)
+<span class="kw">str</span>(DictionaryHE)</code></pre></div>
+<pre><code>## List of 2
+##  $ negative: chr [1:85] &quot;below&quot; &quot;challenge&quot; &quot;challenged&quot; &quot;challenges&quot; ...
+##  $ positive: chr [1:105] &quot;above&quot; &quot;accomplish&quot; &quot;accomplished&quot; &quot;accomplishes&quot; ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(DictionaryLM)
+<span class="kw">str</span>(DictionaryLM)</code></pre></div>
+<pre><code>## List of 3
+##  $ negative   : chr [1:2355] &quot;abandon&quot; &quot;abandoned&quot; &quot;abandoning&quot; &quot;abandonment&quot; ...
+##  $ positive   : chr [1:354] &quot;able&quot; &quot;abundance&quot; &quot;abundant&quot; &quot;acclaimed&quot; ...
+##  $ uncertainty: chr [1:297] &quot;abeyance&quot; &quot;abeyances&quot; &quot;almost&quot; &quot;alteration&quot; ...</code></pre>
+</div>
+<div id="dictionary-functions" class="section level2">
+<h2>Dictionary functions</h2>
+<p>The <code>SentimentAnalysis</code> package distinguishes between three different types of dictionaries. All of them differ by the data they store, which ultimately also controls which methods of sentiment analysis one can apply. The dictionaries are as follows:</p>
+<ul>
+<li><p><code>SentimentDictionaryWordlist</code> contains a list of words belonging to a single category. For instance, it can bundle a list of uncertainty words in order to compute the ratio of uncertainty words in that particular document.</p></li>
+<li><p><code>SentimentDictionaryBinary</code> stores two lists of words, one for positive and one for negative entries. This allows one to later compute the polarity of the document on a scale from very positive to very negative. However, the categories are not further distinguished or rated, i.e. all positive words are assigned the same degree of positivity.</p></li>
+<li><p><code>SentimentDictionaryWeighted</code> allows words to take on continuous sentiment scores. This allows one, for instance, to rate <em>increase</em> as being more positive than <em>improve</em>. These weights can then be transformed into a linear model. For this purpose, the <strong>SentimentDictionaryWeighted</strong> also entails an intercept. It can also store an additional factor in order to revert the weighting by an inverse document frequency.</p></li>
+</ul>
+<div id="sentimentdictionarywordlist" class="section level3">
+<h3>SentimentDictionaryWordlist</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryWordlist</span>(<span class="kw">c</span>(<span class="st">&quot;uncertain&quot;</span>, <span class="st">&quot;possible&quot;</span>, <span class="st">&quot;likely&quot;</span>))
+<span class="kw">summary</span>(d)</code></pre></div>
+<pre><code>## Dictionary type:  word list (single set)
+## Total entries:    3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Alternative call</span>
+d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<span class="kw">c</span>(<span class="st">&quot;uncertain&quot;</span>, <span class="st">&quot;possible&quot;</span>, <span class="st">&quot;likely&quot;</span>))
+<span class="kw">summary</span>(d)</code></pre></div>
+<pre><code>## Dictionary type:  word list (single set)
+## Total entries:    3</code></pre>
+</div>
+<div id="sentimentdictionarybinary" class="section level3">
+<h3>SentimentDictionaryBinary</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryBinary</span>(<span class="kw">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;rise&quot;</span>, <span class="st">&quot;more&quot;</span>),
+                               <span class="kw">c</span>(<span class="st">&quot;fall&quot;</span>, <span class="st">&quot;drop&quot;</span>))
+<span class="kw">summary</span>(d)</code></pre></div>
+<pre><code>## Dictionary type:  binary (positive / negative)
+## Total entries:    5
+## Positive entries: 3 (60%)
+## Negative entries: 2 (40%)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Alternative call</span>
+d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<span class="kw">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;rise&quot;</span>, <span class="st">&quot;more&quot;</span>),
+                         <span class="kw">c</span>(<span class="st">&quot;fall&quot;</span>, <span class="st">&quot;drop&quot;</span>))
+<span class="kw">summary</span>(d)</code></pre></div>
+<pre><code>## Dictionary type:  binary (positive / negative)
+## Total entries:    5
+## Positive entries: 3 (60%)
+## Negative entries: 2 (40%)</code></pre>
+</div>
+<div id="sentimentdictionaryweighted" class="section level3">
+<h3>SentimentDictionaryWeighted</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryWeighted</span>(<span class="kw">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),
+                                 <span class="kw">c</span>(+<span class="dv">1</span>, -<span class="dv">1</span>, -<span class="dv">10</span>),
+                                 <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">3</span>))
+<span class="kw">summary</span>(d)</code></pre></div>
+<pre><code>## Dictionary type:  weighted (words with individual scores)
+## Total entries:    3
+## Positive entries: 1 (33.33%)
+## Negative entries: 2 (66.67%)
+## Neutral entries:  0 (0%)
+## 
+## Details
+## Average score:      -3.333333
+## Median:             -1
+## Min:                -10
+## Max:                1
+## Standard deviation: 5.859465
+## Skewness:           -0.6155602</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Alternative call</span>
+d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<span class="kw">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),
+                         <span class="kw">c</span>(+<span class="dv">1</span>, -<span class="dv">1</span>, -<span class="dv">10</span>),
+                         <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">3</span>))
+<span class="kw">summary</span>(d)                         </code></pre></div>
+<pre><code>## Dictionary type:  weighted (words with individual scores)
+## Total entries:    3
+## Positive entries: 1 (33.33%)
+## Negative entries: 2 (66.67%)
+## Neutral entries:  0 (0%)
+## 
+## Details
+## Average score:      -3.333333
+## Median:             -1
+## Min:                -10
+## Max:                1
+## Standard deviation: 5.859465
+## Skewness:           -0.6155602</code></pre>
+</div>
+</div>
+</div>
+<div id="dictionary-generation" class="section level1">
+<h1>Dictionary generation</h1>
+<p>The following example shows how the <code>SentimentAnalysis</code> package can extract statistically relevant textual drivers based on an exogenous response variable. The details of this method are presented in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2015)</span>, while we provide a brief summary here. Let  denote a response variable in the form of a vector. Furthermore, variables  give the number of occurrences of word  in a document. The methodology then estimates a linear model  with intercept  and coefficients . The estimation routine is based on LASSO regularization, which implicitly performs variable selection. In so doing, it sets some of the coefficients  to exactly zero. The remaining words can then be ranked by polarity according to their coefficient.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a vector of strings</span>
+documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;This is a good thing!&quot;</span>,
+               <span class="st">&quot;This is a very good thing!&quot;</span>,
+               <span class="st">&quot;This is okay.&quot;</span>,
+               <span class="st">&quot;This is a bad thing.&quot;</span>,
+               <span class="st">&quot;This is a very bad thing.&quot;</span>)
+response &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, -<span class="fl">0.5</span>, -<span class="dv">1</span>)
+
+<span class="co"># Generate dictionary with LASSO regularization</span>
+dict &lt;-<span class="st"> </span><span class="kw">generateDictionary</span>(documents, response)
+
+dict</code></pre></div>
+<pre><code>## Type: weighted (words with individual scores)
+## Intercept: 5.55333e-05
+## -0.51 bad
+##  0.51 good</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(dict)</code></pre></div>
+<pre><code>## Dictionary type:  weighted (words with individual scores)
+## Total entries:    2
+## Positive entries: 1 (50%)
+## Negative entries: 1 (50%)
+## Neutral entries:  0 (0%)
+## 
+## Details
+## Average score:      -5.251165e-05
+## Median:             -5.251165e-05
+## Min:                -0.5119851
+## Max:                0.5118801
+## Standard deviation: 0.7239821
+## Skewness:           0</code></pre>
+<p>In practice, users have several options for fine-tuning. Among these, they can disable the intercept  and fix it to zero, or standardize the response variable . In addition, it is possible to replace the LASSO with any variant of the elastic net, simply by changing the argument <code>alpha</code>.</p>
+<p>Finally, one can save and reload dictionaries using <code>read()</code> and <code>write()</code> as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write</span>(dict, <span class="dt">file=</span><span class="st">&quot;dictionary.dict&quot;</span>)
+dict &lt;-<span class="st"> </span><span class="kw">read</span>(<span class="st">&quot;dictionary.dict&quot;</span>)</code></pre></div>
+<div id="performance-evaluation" class="section level2">
+<h2>Performance evaluation</h2>
+<p>Ultimately, several routines allow one to exlore the generated dictionary further. On the one hand, a simple overview can be displayed by means of the <code>summary()</code> routine. On the other hand, a Kernel Density Estimation can also visualize the distribution of positive and negative words. For instance, one can identify whether the opinionated words were skewed to either end of the polarity scale. Lastly, the <code>compareDictionary()</code> routine can compare the generated dictionary to dictionaries from the literature. It automatically computes various metrics, among which are the overlap or the correlation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compareDictionaries</span>(dict,
+                    <span class="kw">loadDictionaryGI</span>())</code></pre></div>
+<pre><code>## Comparing: wordlist vs weighted
+## 
+## Total unique words: 3023
+## Matching entries: 2 (0.0006615944%)
+## Entries with same classification: 0 (0%)
+## Entries with different classification: 2 (0.0006615944%)
+## Correlation between scores of matching entries: 1</code></pre>
+<pre><code>## $totalUniqueWords
+## [1] 3023
+## 
+## $totalSameWords
+## [1] 2
+## 
+## $ratioSameWords
+## [1] 0.0006615944
+## 
+## $numWordsEqualClass
+## [1] 0
+## 
+## $numWordsDifferentClass
+## [1] 2
+## 
+## $ratioWordsEqualClass
+## [1] 0
+## 
+## $ratioWordsDifferentClass
+## [1] 0.0006615944
+## 
+## $correlation
+## [1] 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sentiment &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, documents)
+<span class="kw">compareToResponse</span>(sentiment, response)</code></pre></div>
+<pre><code>##                            Dictionary
+## cor                         0.9486833
+## cor.t.statistic             5.1961524
+## cor.p.value                 5.1961524
+## lm.t.value                  5.1961524
+## r.squared                   0.9000000
+## RMSE                        0.2330104
+## MAE                         0.2000111
+## Accuracy                    1.0000000
+## Precision                   1.0000000
+## Sensitivity                 1.0000000
+## Specificity                 1.0000000
+## F1                          0.5714286
+## BalancedAccuracy            1.0000000
+## avg.sentiment.pos.response  0.4511680
+## avg.sentiment.neg.response -0.6767520</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(sentiment, response)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The following example demonstrates how a calculated dictionary can be used for predicting the sentiment of out-of-sample data. In addition, the code then evaluates the prediction performance by comparing it to the built-in dictionaries.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test_documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;This is neither good nor bad&quot;</span>,
+                    <span class="st">&quot;What a good idea!&quot;</span>,
+                    <span class="st">&quot;Not bad&quot;</span>)
+test_response &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>)
+
+pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_documents)
+
+<span class="kw">compareToResponse</span>(pred, test_response)</code></pre></div>
+<pre><code>##                              Dictionary
+## cor                        5.922189e-05
+## cor.t.statistic            5.922189e-05
+## cor.p.value                5.922189e-05
+## lm.t.value                 5.922189e-05
+## r.squared                  3.507232e-09
+## RMSE                       8.523018e-01
+## MAE                        6.666521e-01
+## Accuracy                   3.333333e-01
+## Precision                  0.000000e+00
+## Sensitivity                         NaN
+## Specificity                3.333333e-01
+## F1                         0.000000e+00
+## BalancedAccuracy                    NaN
+## avg.sentiment.pos.response 1.457684e-05
+## avg.sentiment.neg.response          NaN</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(pred, test_response)</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAArlBMVEUAAAAAADoAAGYAOpAAZrYzMzMzZv86AAA6ADo6kNs9PT1NTU1NTW5NTY5NbqtNjshmAABmtv9uTU1uTW5uTY5ubqtuq+SOTU2OTW6OTY6OyP+QOgCQtpCQ2/+rbk2ryKur5P+2ZgC2kDq22/+2///Ijk3I///KysrW1tbbkDrbkJDb/7bb///kq27k///r6+v/tmb/yI7/25D/27b/5Kv//7b//8j//9v//+T////zS4+aAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAIC0lEQVR4nO3dCVfbRhQFYLGkCbgNOGmTFEoKLSRyS2KgLNH//2PVyJuWmbmj0Wyy7z09HAwP6c2X0WIh1KxgtMliN5B6CARCIBACgRAIhEAgfYBe7VRsgNafzQ2qU6vpuSACgRoCgRoCgRoCgRoCgRoCgRoCgRoCgRoCgRoCgZphQF/z3HE//mtwUTkoh0CQaHRAuWsgIDQyoMWI3ALpjcYEtB6OcyCN0IiAcnugx3eTyVn7Z+pAaqHRAOW5PdDzp8vi8f1l62caQEqisQDlQ4DuT8oPN6sppABSCI0EKB8EJCJm0fJ69HyVr+3MxxnNMIyBfnz+0EZtzyD5NBrBDOoOov8Mev649tEDdYSSB5KNweIodrZ5oQdqEyUOJB9BX6CGDwRqEqUNpOi/L9C3iQg6ismFUgZStu/+TFptlCyQrvcQQCujNIFA44GActOmgwOhvkMB5YZNhwaCbQcDKpMckEHTQYG+4quyQYHy9IBSum69aCg1oFSuW9caSg0IGAUBajeUGpDOyD+QvKHUgOJddVQ2lBpQnKuOuoZSA5IT+QSCDaUGJDPyB2TWUGpAHSNPQH0aSg0o937NqH9DqQHViNwD2TWUGtDayDHQkIZSA8qdXxIZ3lBqQLmzd/xG6xopUD74Da3pusYLtGjNAqjfukYOtGzQFMhiXVsBtOhSC2S9ru0B8lRDIAdFBAIhEAiBQAgEQiCQoUDKmx+3JTY3cXIGEWgTAoEQCIRAIAQCIRAIgUAIBEIgEAKBEAiEQCAEAiEQCIFACARCIBACgRAIhEAgBAIhEAiBQAgEQiAQAoEQCIRAIBBolmXT2cEtgRRAVwf/nk5fzg8JJAd6Op2W/xV3+9cEIpA0aBObiU3s6fSo/rXHX78QaJ27rEzD537ySxcoOz5203RiQMfZhsPwMH/z85/dGZSVQFhofEDHJVDWGaweaL2J1Z/EWQHFvt/SQyog7U2c1V46a+6jJfug3Z1BV4fFbP961jgPku2kd3Uf9LQ4S2we5nkUa21hRwRSAr2cH93tXYgNjUDyfdDD6+ywfEPGN6sqIBACEQhvYiJ8s6oAUl8JIlAVca2DQNoZRCAtkPpSGYGqlG9UuZPWziAQAhHI4PdirUuuBGr4iL1P66I9gTZZngfx1z4EUoWbGAh30iA8zIM4A/ppS2O2iSnfsRKIO2ke5vUhEAi8HrR3wU1MO4OyVaSTaOeBUAhEIAAkuz+IQLXI7g8iUGMCde8PIlADqHt/EIE2kd4fVAfa+Sdx8v4gHub1IRAI/14MhH8vBsI/hwIhEIjN34sRqJ7u34sRSKVBIDXQP9wHSYGuskwc4J9OuZOWAs32r8t3q2I3pPrN4W4DCZzi7uCvTHkiveNA1S/FyrfzymMYgSogjQ+BSqA3FwQikDoEAtED6X/vvPNABiEQgQikD4FACARCIBACgRAIhEAgBAIhEAiBQAgE0h/o+ePk7XcCKfPj81nx7SQqkMkTCeMBPf/+pfYQsxhAx8euntnoBejxt+/F86dLUV97EmfImzgroGBr6/2/U79/uwLiDAIzKBYQ90HBajwdxT7EPoqlDcTzIJ5JN0IgEAKBEAiEQCAEAiEQCIFACARCIBACgRAIhEAgowGqr3VefzFgXdsC1FnrvPMVu3WNH0ix1i5Ql2nrgXRrVQHVlbYbCKxVC7Q02mIgvFYEJIy2E8hs8MY1WwbUb/CGNVsDZDN4w5ptALIevFnNyIGGDd6wZrRALgZvWDNCIHeDN6sZG5DxwNzVjAqoz8Cc1YwGqO/AHNaMAMhuYA5rkgYaMjB3NcGAet/EOU8lvm7ibAGtPzOcQXCJgWZQUU2i1DaxcIM3qzFpOhyQw4E5A5rjSyLBgEybDg2EhEIBGTcdHAgIBQHq03R4oEJrFAKoV9NRgDRE/oF6Nh0JSCnkGah/07GACoWRVyCbpiMCSYl8Alk1HRVIQuQPyLLpyEAdIW9Atk3HBmoTeQLq0U/EGpPrsj6AevYTr0ZZ5Beofz+xakyuy7oHsuonTo2uyBOQdT9RakCRB6BB/YSvgUWOgQb3E7oGFzkFctBP4BqTC9fOgFIbvCOggkDmNQQCNQQCNQQCNQQCNQQCNQQCNQQCNQQCNVZAOxULoH55hUuCLsdyQQQCIRCIP6AtCYFACARCIBACgfgA2jyd8vHdZHI2eCmNp12GbscD0OYp3eI5uY/vL9EPgKU0n/oduh0PQJsn5N6Lvm7sptBmKc0n7oZuxwNQ8xnLm89sl9JcXuh2PAA1ntItnic8cCnNp36Hbscx0M1kclL/J3v+aOnjZwZZtON1H1QeNmyPYT72QVbteDmKrZ7SPcCntpTmU79Dt+PvPKj8V/s2EbFEWi/FzXmQbTs8kwYhEAiBQAgEQiAQAoEQCIRAIAkAzbIs27uQfOO/v4uHN7JvNGv8Jj7QbP+6KO6yaecbEMewZliiA72cVzRXB7ft7xCoysv50ebTLCun08ObP15n2fSh/HBUAixeHomXU2mN3/6iA5Vb13KML+eH5QZ3cPvwupxN5YYnZocAql5mi6/JavwmPtBiL12O+07sjJ5Oy2kxrbadNZB4ufyarMZvUgAqxJgPboVTttisGkDLl9UHWY3fJAJUDX65n9YCSWr8JjrQcohi81meDOmAZDV+Ex2ouBJjFjvfl/NyepQCq8GXu5oOkKzGb+IDVfvo6kAmDuF7F2uM4io7bAPJavx2lwBQ2iEQCIFACARCIBACgRAI5H9ACR4ZhFzO3AAAAABJRU5ErkJggg==" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compareToResponse</span>(<span class="kw">analyzeSentiment</span>(test_documents), test_response)</code></pre></div>
+<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
+<pre><code>## Warning in cor(x, y): the standard deviation is zero
+
+## Warning in cor(x, y): the standard deviation is zero
+
+## Warning in cor(x, y): the standard deviation is zero
+
+## Warning in cor(x, y): the standard deviation is zero</code></pre>
+<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
+<pre><code>##                             WordCount SentimentGI NegativityGI
+## cor                        -0.8660254 -0.18898224   0.18898224
+## cor.t.statistic            -1.7320508 -0.19245009   0.19245009
+## cor.p.value                -1.7320508 -0.19245009   0.19245009
+## lm.t.value                 -1.7320508 -0.19245009   0.19245009
+## r.squared                   0.7500000  0.03571429   0.03571429
+## RMSE                        1.8257419  1.19023807   0.60858062
+## MAE                         1.3333333  0.83333333   0.44444444
+## Accuracy                    1.0000000  0.66666667   1.00000000
+## Precision                         NaN  0.00000000          NaN
+## Sensitivity                       NaN         NaN          NaN
+## Specificity                 1.0000000  0.66666667   1.00000000
+## F1                          0.0000000  0.00000000   0.00000000
+## BalancedAccuracy                  NaN         NaN          NaN
+## avg.sentiment.pos.response  2.0000000 -0.16666667   0.44444444
+## avg.sentiment.neg.response        NaN         NaN          NaN
+##                            PositivityGI SentimentHE NegativityHE
+## cor                         -0.18898224 -0.18898224           NA
+## cor.t.statistic             -0.19245009 -0.19245009           NA
+## cor.p.value                 -0.19245009 -0.19245009           NA
+## lm.t.value                  -0.19245009 -0.19245009           NA
+## r.squared                    0.03571429  0.03571429           NA
+## RMSE                         0.67357531  0.67357531    0.8164966
+## MAE                          0.61111111  0.61111111    0.6666667
+## Accuracy                     1.00000000  1.00000000    1.0000000
+## Precision                           NaN         NaN          NaN
+## Sensitivity                         NaN         NaN          NaN
+## Specificity                  1.00000000  1.00000000    1.0000000
+## F1                           0.00000000  0.00000000    0.0000000
+## BalancedAccuracy                    NaN         NaN          NaN
+## avg.sentiment.pos.response   0.27777778  0.27777778    0.0000000
+## avg.sentiment.neg.response          NaN         NaN          NaN
+##                            PositivityHE SentimentLM NegativityLM
+## cor                         -0.18898224 -0.18898224   0.18898224
+## cor.t.statistic             -0.19245009 -0.19245009   0.19245009
+## cor.p.value                 -0.19245009 -0.19245009   0.19245009
+## lm.t.value                  -0.19245009 -0.19245009   0.19245009
+## r.squared                    0.03571429  0.03571429   0.03571429
+## RMSE                         0.67357531  1.19023807   0.60858062
+## MAE                          0.61111111  0.83333333   0.44444444
+## Accuracy                     1.00000000  0.66666667   1.00000000
+## Precision                           NaN  0.00000000          NaN
+## Sensitivity                         NaN         NaN          NaN
+## Specificity                  1.00000000  0.66666667   1.00000000
+## F1                           0.00000000  0.00000000   0.00000000
+## BalancedAccuracy                    NaN         NaN          NaN
+## avg.sentiment.pos.response   0.27777778 -0.16666667   0.44444444
+## avg.sentiment.neg.response          NaN         NaN          NaN
+##                            PositivityLM RatioUncertaintyLM SentimentQDAP
+## cor                         -0.18898224                 NA   -0.18898224
+## cor.t.statistic             -0.19245009                 NA   -0.19245009
+## cor.p.value                 -0.19245009                 NA   -0.19245009
+## lm.t.value                  -0.19245009                 NA   -0.19245009
+## r.squared                    0.03571429                 NA    0.03571429
+## RMSE                         0.67357531          0.8164966    1.19023807
+## MAE                          0.61111111          0.6666667    0.83333333
+## Accuracy                     1.00000000          1.0000000    0.66666667
+## Precision                           NaN                NaN    0.00000000
+## Sensitivity                         NaN                NaN           NaN
+## Specificity                  1.00000000          1.0000000    0.66666667
+## F1                           0.00000000          0.0000000    0.00000000
+## BalancedAccuracy                    NaN                NaN           NaN
+## avg.sentiment.pos.response   0.27777778          0.0000000   -0.16666667
+## avg.sentiment.neg.response          NaN                NaN           NaN
+##                            NegativityQDAP PositivityQDAP
+## cor                            0.18898224    -0.18898224
+## cor.t.statistic                0.19245009    -0.19245009
+## cor.p.value                    0.19245009    -0.19245009
+## lm.t.value                     0.19245009    -0.19245009
+## r.squared                      0.03571429     0.03571429
+## RMSE                           0.60858062     0.67357531
+## MAE                            0.44444444     0.61111111
+## Accuracy                       1.00000000     1.00000000
+## Precision                             NaN            NaN
+## Sensitivity                           NaN            NaN
+## Specificity                    1.00000000     1.00000000
+## F1                             0.00000000     0.00000000
+## BalancedAccuracy                      NaN            NaN
+## avg.sentiment.pos.response     0.44444444     0.27777778
+## avg.sentiment.neg.response            NaN            NaN</code></pre>
+</div>
+<div id="configuration-of-preprocessing" class="section level2">
+<h2>Configuration of preprocessing</h2>
+<p>When desired, one can implement a tailored preprocessing stage that adapts to specific needs. The following code snippets demonstrate such adaptation. In particular, the <code>SentimentAnalysis</code> package ships a function <code>ngram_tokenize()</code> in order to extract -grams from the corpus. This does not affect the results of the built-in dictionaries but rather changes the features used as part of dictionary generation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(<span class="kw">VectorSource</span>(documents))
+tdm &lt;-<span class="st"> </span><span class="kw">TermDocumentMatrix</span>(corpus, 
+                          <span class="dt">control=</span><span class="kw">list</span>(<span class="dt">wordLengths=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="ot">Inf</span>), 
+                                       <span class="dt">tokenize=</span>function(x) <span class="kw">ngram_tokenize</span>(x, <span class="dt">char=</span><span class="ot">FALSE</span>, 
+                                                                           <span class="dt">ngmin=</span><span class="dv">1</span>, <span class="dt">ngmax=</span><span class="dv">2</span>)))
+<span class="kw">rownames</span>(tdm)</code></pre></div>
+<pre><code>##  [1] &quot;a&quot;           &quot;a bad&quot;       &quot;a good&quot;      &quot;a very&quot;      &quot;bad&quot;        
+##  [6] &quot;bad thing.&quot;  &quot;good&quot;        &quot;good thing!&quot; &quot;is&quot;          &quot;is a&quot;       
+## [11] &quot;is okay.&quot;    &quot;okay.&quot;       &quot;thing!&quot;      &quot;thing.&quot;      &quot;this&quot;       
+## [16] &quot;this is&quot;     &quot;very&quot;        &quot;very bad&quot;    &quot;very good&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dict &lt;-<span class="st"> </span><span class="kw">generateDictionary</span>(tdm, response)
+<span class="kw">summary</span>(dict)</code></pre></div>
+<pre><code>## Dictionary type:  weighted (words with individual scores)
+## Total entries:    7
+## Positive entries: 3 (42.86%)
+## Negative entries: 4 (57.14%)
+## Neutral entries:  0 (0%)
+## 
+## Details
+## Average score:      2.136424e-06
+## Median:             -5.891262e-05
+## Min:                -0.4368759
+## Max:                0.4380331
+## Standard deviation: 0.3016221
+## Skewness:           0.004124293</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dict</code></pre></div>
+<pre><code>## Type: weighted (words with individual scores)
+## Intercept: -3.230431e-05
+## -0.44 bad
+## -0.29 very bad
+## -0.00 bad thing.
+## -0.00 thing.
+##  0.00 good thing!
+##  0.29 a good
+##  0.44 good</code></pre>
+</div>
+<div id="performance-optimization" class="section level2">
+<h2>Performance optimization</h2>
+<p>Once the user has decided upon a preferred rule, he can adapt the <code>analyzeSentiment()</code> routine by restricting it to calculate only the rules of interest. Such behavior can be implemented by changing the default value of the argument <code>rules</code>. See the following code snippets for an example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(documents,
+                              <span class="dt">rules=</span><span class="kw">list</span>(<span class="st">&quot;SentimentLM&quot;</span>=<span class="kw">list</span>(ruleSentiment, <span class="kw">loadDictionaryLM</span>())))
+sentiment</code></pre></div>
+<pre><code>##   SentimentLM
+## 1         0.5
+## 2         0.5
+## 3         0.0
+## 4        -0.5
+## 5        -0.5</code></pre>
+</div>
+<div id="language-support-and-extensibility" class="section level2">
+<h2>Language support and extensibility</h2>
+<p><code>SentimentAnalysis</code> can be adapted for use with languages other than English. In order to do this, one needs to introduce changes at two points:</p>
+<ul>
+<li><p><strong>Preprocessing:</strong> The built-in routines use a parameter <code>language=&quot;english&quot;</code> to perform all preprocessing operations for the English language. Instead, one might prefer to change stemming and stopwords to a desired language. If one wishes to make further changes to the preprocessing, it might be beneficial to replace the automatic preprocessing with one’s own routines, which then return a <code>DocumentTermMatrix</code>.</p></li>
+<li><p><strong>Dictionary:</strong> If one has a response or baseline variable, one can use the dictionary generation approach that is shipped with <code>SentimentAnalysis</code>. This can then automatically generate a dictionary of positive and negative words that can be applied to the given language. Otherwise, if one has no baseline variable at hand, one needs to load a dictionary for that langauge. It might be worthwhile to search online for pre-defined lists of positive and negative words.</p></li>
+</ul>
+<p>The following example demonstrates how <code>SentimentAnalysis</code> can be adapted to work with a sample in German. Here, we supply a positive and negative document in the variable <code>documents</code>. Afterwards, we introduce a very small dictionary of positive and negative words, which is stored in <code>dictionaryGerman</code>. Finally, we use <code>analyzeSentiment()</code> to perform a sentiment analysis, where we introduce changes as follows: first of all, we supply <code>language=&quot;german&quot;</code> to ensure that all preprocessing operations are being made for the German language. Additionally, we define our custom rule for <code>GermanSentiment</code> that uses our previous, customized dictionary.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Das ist ein gutes Resultat&quot;</span>,
+               <span class="st">&quot;Das Ergebnis war schlecht&quot;</span>)
+dictionaryGerman &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryBinary</span>(<span class="kw">c</span>(<span class="st">&quot;gut&quot;</span>), 
+                                              <span class="kw">c</span>(<span class="st">&quot;schlecht&quot;</span>))
+
+sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(documents,
+                              <span class="dt">language=</span><span class="st">&quot;german&quot;</span>,
+                              <span class="dt">rules=</span><span class="kw">list</span>(<span class="st">&quot;GermanSentiment&quot;</span>=<span class="kw">list</span>(ruleSentiment, dictionaryGerman)))
+sentiment</code></pre></div>
+<pre><code>##   GermanSentiment
+## 1             0.0
+## 2            -0.5</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">convertToBinaryResponse</span>(sentiment$GermanSentiment)</code></pre></div>
+<pre><code>## [1] positive negative
+## Levels: negative positive</code></pre>
+<p>Similarly, one can implement a dictionary with custom sentiment scores.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">woorden &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;goed&quot;</span>,<span class="st">&quot;slecht&quot;</span>)
+scores &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.8</span>,-<span class="fl">0.5</span>)
+dictionaryDutch &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryWeighted</span>(woorden, scores)
+documents &lt;-<span class="st"> &quot;dit is heel slecht&quot;</span>
+sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(documents,
+                              <span class="dt">language=</span><span class="st">&quot;dutch&quot;</span>,
+                              <span class="dt">rules=</span><span class="kw">list</span>(<span class="st">&quot;DutchSentiment&quot;</span>=<span class="kw">list</span>(ruleLinearModel, dictionaryDutch)))
+sentiment</code></pre></div>
+<pre><code>##   DutchSentiment
+## 1           -0.5</code></pre>
+<p>Notes:</p>
+<ul>
+<li><p>The argument <code>rules</code> is a named list of approaches, where each entry specifies a combination of a rule and a dictionary.</p></li>
+<li><p>Caution is needed when working with stemming. The default routines of <code>SentimentAnalysis</code> automatically perform stemming. Therefore, it is necessary to included stemmed terms in the original dictionary. One can easily achieve such a conversion by calling <code>tm::stemDocument()</code>.</p></li>
+</ul>
+</div>
+</div>
+<div id="worked-examples" class="section level1">
+<h1>Worked examples</h1>
+<p>The following example shows the usage of <code>SentimentAnalysis</code> in an applied setting. More precisely, we utilize Reuters oil-related news from the <code>tm</code> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tm)
+<span class="kw">data</span>(<span class="st">&quot;crude&quot;</span>)
+
+<span class="co"># Analyze sentiment</span>
+sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(crude)
+
+<span class="co"># Count positive and negative news releases</span>
+<span class="kw">table</span>(<span class="kw">convertToBinaryResponse</span>(sentiment$SentimentLM))</code></pre></div>
+<pre><code>## 
+## negative positive 
+##       16        4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># News releases with highest and lowest sentiment</span>
+crude[[<span class="kw">which.max</span>(sentiment$SentimentLM)]]$meta$heading</code></pre></div>
+<pre><code>## [1] &quot;HOUSTON OIL &lt;HO&gt; RESERVES STUDY COMPLETED&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crude[[<span class="kw">which.min</span>(sentiment$SentimentLM)]]$meta$heading</code></pre></div>
+<pre><code>## [1] &quot;DIAMOND SHAMROCK (DIA) CUTS CRUDE PRICES&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># View summary statistics of sentiment variable</span>
+<span class="kw">summary</span>(sentiment$SentimentLM)</code></pre></div>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.08772 -0.04366 -0.02341 -0.02953 -0.01375  0.00000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Visualize distribution of standardized sentiment variable</span>
+<span class="kw">hist</span>(<span class="kw">scale</span>(sentiment$SentimentLM))</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAflBMVEUAAAAAADoAAGYAOjoAOpAAZmYAZrY6AAA6ADo6AGY6OgA6kNtmAABmADpmAGZmOpBmZgBmZjpmkJBmtrZmtv+QOgCQOjqQZgCQtpCQ29uQ2/+2ZgC2Zma225C2/7a2/9u2///bkDrb25Db/7bb////tmb/25D//7b//9v///8QYUwcAAAACXBIWXMAAA7DAAAOwwHHb6hkAAALYklEQVR4nO2d64KrthWF8WRqT8q0SRs7TUzTHHIG27z/C1bakkDMYJYAcTFe68dchLQlfWyEgI1ISqpTydINWLsICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgICeBtDl7TyoXDxAWZIk+6Cct1Py+tFIub7vwpr/328tpWERXYFqnS2WJ/XfuJ5ogApdbRqU9WsX87A+X99f+gKSIuXlkDgqqrjRMayeaIDyJNAJWgCphCC0WaJ720umiPr5x9tvBw0lt3y6TPn11LtdHSK7s2xSfVXGVH8FvO638tB9IdTzpAFCcqSmdL3Fd+Ki2luVNQeoOigLU9IvVm3LpVWSQep4+VOXbmtQZ5H08vb7SW/OXBNMo3A9Dc/b/d0AMqmFQa3KmHxf2dvdoQz4gHIvW2b+Ti0pyWMAWZs6V25/VgmNbVW5Lw33GwSK7N0gbb1D7a00rB69xTRf8FpAltneWtKG0rLaZe54UNtURpNQH2J674rB1P5UCS/fPGsGkLRUbUptRX6xepu2bprkkm8OULNBXUWk997eq46BkHrsv5nbDSbX0feRvU43+1z9NOz9veGOy3OFrfIx2z73v7Hmqk5L4zwGjVfM22YbozbuPzW82aDOIu740A10g/QxtB6z7+thweurs7W3e7fqiAXkCkn+GpAtlpbN4bi2Jqn2xKKbbSx6xbxt1q6putHwZoM6i1SH/bEaFcVfguqRAkezoQlIWmy2tANyhQrj6JXjugHiaA+emo+xJlUXSdU4a7Eu5m0LBdRZRPz67V/17KcweyqonvseVI1jPT2o2mGvH54HedacB7njuLZoi3nbenjQ/SIG0LlQf1d1ZeYfXE/rGCR9LdxRmd4BdGcMKm+/nsuG2UJt8qx5XfQB1cW8baGAOovoHArQ5SCm3fATWE/rWcx5kPjAXQ+6cxYzqcZ5CjvmJEfPmjuLqZbKMFvZrYrV2xoNz6tJwtcGgSK7397UNGfvTRRtf2E9JueneVBjvL8PyNW2L31ALnVnHKIemRuDtBtyTFP2zWL1tkbD9ZhRTxSbDeoq8s2Oxm6K6AbpoHqqU7p4z5ez2O5cn4i/AjLngWPZBGRS7bFfXaPV1uzIJE21g5j88or52+qGy2z/93ZAXUXOjYtVMzSbPgTUUzaU9btSjqQi/DpusMbe7siEqZknzS61HzuureNoLCA3JZh+V7YpX2S/BKk6xOrr1gVk7tqsUk9zy3WoCAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICKgfoMzGzi4TA7KIegESPm8SiDV5PM9a1AfQ9V0HS5pXPxaKk5lf/QDp0HAJ7iua8TxV5OhcQ1rSpmlq6pNZe0/e6UGzAZqt7l5WdSCYuFBxb5R+ckBVKOPdiMKnBzSzuV71EBCoh4BAPQQE6iEgUA8BgXoICNRDQKAeAgL1EBCoh4BAPRMD8t8AjmBuYi3iQXkSugBQkLlJtdQhNprR1gEZRP3f/pv/jmJgWuSazHIzt9PwG85bBqRfWjVkiuEvkG4YUPBCdGHmJhbnQQPqmRxQJouRjDvRbxlQJgPQ9X3UdHHDgNzT5BEjdLlpQPaRab0g2zhzE2uJQyyXBUYuB86k71mtVsqMY25S8TQ/oB4CAvVMDcgt7sVB+o7VLJjM5XA3vmzDgCR8rFv+Erx3aG4aEA47tBciz+lBt1PANcb1XV+PfAW01htmESL16uxF0Ep0mSxU/igeFMHR/KcaQWexPEmfE1CwLocfCKhTXctCbhqQrIqbbeqGWVRAxe6c69Vdt3Q1HxOQvh+kw8M3dT8o7lnsKIA2dUdxCg/KRr2msmFAdgzKxy1cvGVAZqq4rTuKy8yDZjTXqx4CAvWs5Fos0NzEWs6Dxp3lnwCQfSd1qJ4A0CAXinfDLPAWV2vPw26OjQW08KVGXNeYANDS0R3rBeTOYuNeiN8woDgioKnNrRdQwFPBPuZiGlgHIPvYZ+mr+fUCup0MmXHLlmwY0PUf5kbHwncU1wvIedDCdxTXC8guWJKPu2O2ZUCN7wAO1aYBxdCzA8oT903MqQKo1gwIP3rO5YOc8k3UJwSEHz2bYHx53+4JAQU8enZRemomkEdZ5G34La5FrsXgo2f3OkeZ7eN40OQ9n8KDuiaKDov5qHinuX6VdxtYB6CgR89u6+30hIAWePT8YIBiaMOAqhF4lDYMKM4CvxsGNPah85DaHwrQEsELDwUojggoqrnHARRtCfZNA4pxoiegIHMjchMQyE1AIPdGAX2639UaJjYidGzqbF2axINC2/VIgGKEdpTbBRRNBBRkjoCAOQIC5ggImCMgYI6AgDkCAuYICJgjIGCOgIC55wUEF4J7ckC5Wyv47qLBzw3Iux/S/RHIZwXkPfvo/oxo8A2zRTQdoAAP2p56jkHWhcYuXP5A6udwcd7bfChFngdtT7MBeoQBubXd401ErWiRbBObiFoRAa0x28QmolZEQGvMNrGJqBUR0BqzTWwiakUEtMZsE5vYtggIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgOYCJIEzQY9jLz/ei61xKkIXiMCmsGYCdDupLuVJ0Dfe0MsiejW6IoQQNhWgmQCZT5IFrFVdwLdpTAhFwMLp2FSIZh2D8H4vkhQtcBDKOsBUiGYFFPSlUgjo7RyQK8hUiOYEFBY0g3pl3DBoEHowQEXIGP3EgEKDrp7uEMvNBCgHfHI3T4o1SAeYCtFcHhS+kDfqVfBp/qEAXQ7BQY2wV8ETxUcClJuArzgjax56qfFAgB5XBAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAT0KICuPy20Ik90QM1vmLgvSLeqOIZ88aTQOTIXHCMrGLU/cg835z5TeDvZmJwief1wXwP/pIkB5R1RKmGfg5Fc2cv/fvpLxwUVEkWTtcUu9DFXAzJ/Zfp30bps1LSAOhsd3qPL4agOMd0tExZ0O7VwHwTob+I213/+rFLavX0woMshMZ811pEtur2Z+V9a4MLFJP6kkTPVOX5Rx8lRJ79+l+7r/1P9/51cfwmg8hOZweY+akB7+TJx8fofndK6ct1QQBfn8ObzxqnsW/O3SZOQKZ3YyKlTr+866n531jmNf0gUvmKp4+rac71+N4O0Fwg63JznQXs5rrJUUlqjsoYCcrFJ7tPHMsRpFqoFJk3lkD+aOV2qPmqqHqWl+3FszSVOuLc7xo7RY8x5gPTrHKrtkmKiHyMBcu9B+EYL7dSqBWZPuNa4nJ9TvR4dy+pHa67SnL1sFJ8aWqsgvGHmPEB64CnsQdf6nevBY5C8vnO0QbmlHOsvfxgPKuwKa0dDz+asUrt71JarlHmQF6ev/hxjzgOkz7NqHJoAkLRzd3YeVDWr8qDSP7GonM3U7l3+KZcBpPaFq60YZ84HdPnxz1/PUwGqxhs70hTJ0euTX2MztaNHrblUNxUg9dOdxWRQGWyuAeh2+rcahuKPQbJrCnNmkMFOnCdJq7OYzOb0WayRU6fWbU2/9uhOLnUW+/6+N1NeG7Q/3FwDkJqe7G1K1LOYDCli0M6DJDbXtSS31wPWr7ycKsG1Vc9fv3/pUVuuDxnGxHm8D1IPN5eZgSkVQDI5z6LPg8IU7eOSc1ystjd24qv5rmuxtWmma7GmOq/m16W5rua3JgICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiAgAgIiICACAiIgIAICIiCg/wO/tWel7siVHAAAAABJRU5ErkJggg==" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Compute cross-correlation </span>
+<span class="kw">cor</span>(sentiment[, <span class="kw">c</span>(<span class="st">&quot;SentimentLM&quot;</span>, <span class="st">&quot;SentimentHE&quot;</span>, <span class="st">&quot;SentimentGI&quot;</span>)])</code></pre></div>
+<pre><code>##             SentimentLM SentimentHE SentimentGI
+## SentimentLM   1.0000000   0.2769878   0.4301661
+## SentimentHE   0.2769878   1.0000000   0.3525966
+## SentimentGI   0.4301661   0.3525966   1.0000000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># crude oil news between  1987-02-26 until 1987-03-02</span>
+datetime &lt;-<span class="st"> </span><span class="kw">do.call</span>(c, <span class="kw">lapply</span>(crude, function(x) x$meta$datetimestamp))
+
+<span class="kw">plotSentiment</span>(sentiment$SentimentLM)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentiment</span>(sentiment$SentimentLM, <span class="dt">x=</span>datetime, <span class="dt">cumsum=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="word-couting" class="section level1">
+<h1>Word couting</h1>
+<p><code>SentimentAnalysis</code> can also be used to count words with the help of <code>countWords()</code> in documents.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># count words (without stopwords)</span>
+<span class="kw">countWords</span>(documents)</code></pre></div>
+<pre><code>##   WordCount
+## 1         3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># count all words (including stopwords)</span>
+<span class="kw">countWords</span>(documents, <span class="dt">removeStopwords=</span><span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>##   WordCount
+## 1         4</code></pre>
+<p>Note: The package has a built-in rule <code>ruleWordCount()</code>, which is used for the “WordCount” column when calling <code>analyzeSentiment()</code>. However, the former is likely to return different results as it is subject to the preprocessing rules of <code>analyzeSentiment()</code>. By default, it removes stopwords, excludes words with equal or less than 3 letters and might apply a sparsity operation. Hence, one should always use <code>countWords()</code> when working with word counts.</p>
+</div>
+<div id="outlook" class="section level1">
+<h1>Outlook</h1>
+<p>The current version leaves open avenues for further enhancement. In the future, we see the following items as being potentially subject to improvements:</p>
+<ul>
+<li><p><strong>Negations:</strong> We envision a generic negation rule object that can be injected to negate fixed windows or apply complex negation rules <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2016)</span>.</p></li>
+<li><p><strong>Multi-language support:</strong> The current version has built-in dictionaries for the English language only. We think that the package would benefit greatly from support of further languages. In such a setup, one would not need to adapt the preprocessing routines, as the underlying <code>tm</code> package would already have support for further languages <span class="citation">(Feinerer, Hornik, and Meyer 2008)</span>. Instead, it would only be required that the user tailor the applied dictionaries.</p></li>
+</ul>
+<p>We cordially invite everyone to contribute source code, dictionaries and further demos.</p>
+</div>
+<div id="license" class="section level1">
+<h1>License</h1>
+<p><strong>SentimentAnalysis</strong> is released under the <a href="https://opensource.org/licenses/MIT">MIT License</a> Copyright (c) 2016 Stefan Feuerriegel &amp; Nicolas Pröllochs</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-Feinerer.2008">
+<p>Feinerer, Ingo, Kurt Hornik, and David Meyer. 2008. “Text Mining Infrastructure in R.” <em>Journal of Statistical Software</em> 25 (5): 1–54.</p>
+</div>
+<div id="ref-Henry.2008">
+<p>Henry, Elaine. 2008. “Are Investors Influenced by How Earnings Press Releases Are Written?” <em>Journal of Business Communication</em> 45 (4): 363–407.</p>
+</div>
+<div id="ref-Loughran.2011">
+<p>Loughran, Tim, and Bill McDonald. 2011. “When Is a Liability Not a Liability? Textual Analysis, Dictionaries, and 10-Ks.” <em>Journal of Finance</em> 66 (1): 35–65.</p>
+</div>
+<div id="ref-Pang.2008">
+<p>Pang, Bo, and Lillian Lee. 2008. “Opinion Mining and Sentiment Analysis.” <em>Foundations and Trends in Information Retrieval</em> 2 (1): 1–135. doi:<a href="https://doi.org/10.1561/1500000011">10.1561/1500000011</a>.</p>
+</div>
+<div id="ref-ECIS.2015">
+<p>Pröllochs, Nicolas, Stefan Feuerriegel, and Dirk Neumann. 2015. “Generating Domain-Specific Dictionaries Using Bayesian Learning.” In <em>23rd European Conference on Information Systems (Ecis)</em>. Münster, Germany. doi:<a href="https://doi.org/10.2139/ssrn.2522884">10.2139/ssrn.2522884</a>.</p>
+</div>
+<div id="ref-DSS.2016">
+<p>———. 2016. “Negation Scope Detection in Sentiment Analysis: Decision Support for News-Driven Trading.” <em>Decision Support Systems</em>. doi:<a href="https://doi.org/10.1016/j.dss.2016.05.009">10.1016/j.dss.2016.05.009</a>.</p>
+</div>
+<div id="ref-Ravi.2015">
+<p>Ravi, Kumar, and Vadlamani Ravi. 2015. “A Survey on Opinion Mining and Sentiment Analysis: Tasks, Approaches and Applications.” <em>Knowledge-Based Systems</em> 89: 14–46. doi:<a href="https://doi.org/10.1016/j.knosys.2015.06.015">10.1016/j.knosys.2015.06.015</a>.</p>
+</div>
+<div id="ref-Tetlock.2007">
+<p>Tetlock, Paul C. 2007. “Giving Content to Investor Sentiment: The Role of Media in the Stock Market.” <em>Journal of Finance</em> 62 (3): 1139–68.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
