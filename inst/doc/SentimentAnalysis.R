@@ -1,19 +1,11 @@
-## ----eval=FALSE----------------------------------------------------------
-#  library(devtools)
-#  
-#  # Option 1: download and install latest version from GitHub
-#  install_github("sfeuerriegel/SentimentAnalysis")
-#  
-#  # Option 2: install directly from bundled archive
-#  install_local("SentimentAnalysis_1.1.0.tar.gz")
-
 ## ------------------------------------------------------------------------
+# install.packages("SentimentAnalysis")
 library(SentimentAnalysis)
 
 ## ------------------------------------------------------------------------
 # Analyze a single string to obtain a binary response (positive / negative)
 sentiment <- analyzeSentiment("Yeah, this was a great soccer game for the German team!")
-convertToBinaryResponse(sentiment)$SentimentGI
+convertToBinaryResponse(sentiment)$SentimentQDAP
 
 ## ------------------------------------------------------------------------
 # Create a vector of strings
@@ -27,11 +19,11 @@ documents <- c("Wow, I really like the new light sabers!",
 # Analyze sentiment
 sentiment <- analyzeSentiment(documents)
 
-# Extract dictionary-based sentiment according to the Harvard-IV dictionary
-sentiment$SentimentGI
+# Extract dictionary-based sentiment according to the QDAP dictionary
+sentiment$SentimentQDAP
 
 # View sentiment direction (i.e. positive, neutral and negative)
-convertToDirection(sentiment$SentimentGI)
+convertToDirection(sentiment$SentimentQDAP)
 
 response <- c(+1, +1, +1, -1, 0, -1)
 
@@ -39,35 +31,32 @@ compareToResponse(sentiment, response)
 
 compareToResponse(sentiment, convertToBinaryResponse(response))
 
-plotSentimentResponse(sentiment$SentimentGI, response)
+plotSentimentResponse(sentiment$SentimentQDAP, response)
 
 ## ------------------------------------------------------------------------
 documents <- c("This is good",
                "This is bad",
                "This is inbetween")
-convertToDirection(analyzeSentiment(documents)$SentimentGI)
+convertToDirection(analyzeSentiment(documents)$SentimentQDAP)
 
 ## ------------------------------------------------------------------------
 library(tm)
 corpus <- VCorpus(VectorSource(documents))
-convertToDirection(analyzeSentiment(corpus)$SentimentGI)
+convertToDirection(analyzeSentiment(corpus)$SentimentQDAP)
 
 ## ------------------------------------------------------------------------
 dtm <- preprocessCorpus(corpus)
-convertToDirection(analyzeSentiment(dtm)$SentimentGI)
+convertToDirection(analyzeSentiment(dtm)$SentimentQDAP)
 
 ## ------------------------------------------------------------------------
 # Make dictionary available in the current R environment
-data(DictionaryGI)
+data(DictionarHE)
 # Display the internal structure 
-str(DictionaryGI)
-# Access dictionary as an object of type SentimentDictionary
-dict.GI <- loadDictionaryGI()
-# Print summary statistics of dictionary
-summary(dict.GI)
-
-data(DictionaryHE)
 str(DictionaryHE)
+# Access dictionary as an object of type SentimentDictionary
+dict.HE <- loadDictionaryHE()
+# Print summary statistics of dictionary
+summary(dict.HE)
 
 data(DictionaryLM)
 str(DictionaryLM)
@@ -124,7 +113,7 @@ summary(dict)
 
 ## ------------------------------------------------------------------------
 compareDictionaries(dict,
-                    loadDictionaryGI())
+                    loadDictionaryQDAP())
 
 sentiment <- predict(dict, documents)
 compareToResponse(sentiment, response)
@@ -204,7 +193,7 @@ summary(sentiment$SentimentLM)
 hist(scale(sentiment$SentimentLM))
 
 # Compute cross-correlation 
-cor(sentiment[, c("SentimentLM", "SentimentHE", "SentimentGI")])
+cor(sentiment[, c("SentimentLM", "SentimentHE", "SentimentQDAP")])
 
 # crude oil news between  1987-02-26 until 1987-03-02
 datetime <- do.call(c, lapply(crude, function(x) x$meta$datetimestamp))
