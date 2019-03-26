@@ -13,14 +13,14 @@
 <meta name="author" content="Stefan Feuerriegel" />
 <meta name="author" content="Nicolas Proellochs" />
 
-<meta name="date" content="2018-04-09" />
+<meta name="date" content="2019-03-26" />
 
 <title>SentimentAnalysis Vignette</title>
 
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 div.sourceCode { overflow-x: auto; }
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
   margin: 0; padding: 0; vertical-align: baseline; border: none; }
@@ -56,11 +56,36 @@ code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
 <link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+
+
 
 </head>
 
@@ -70,9 +95,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">SentimentAnalysis Vignette</h1>
-<h4 class="author"><em>Stefan Feuerriegel</em></h4>
-<h4 class="author"><em>Nicolas Proellochs</em></h4>
-<h4 class="date"><em>2018-04-09</em></h4>
+<h4 class="author">Stefan Feuerriegel</h4>
+<h4 class="author">Nicolas Proellochs</h4>
+<h4 class="date">2019-03-26</h4>
 
 
 <div id="TOC">
@@ -133,7 +158,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1>Methods for sentiment analysis</h1>
 <p>As sentiment analysis is applied to a broad variety of domains and textual sources, research has devised various approaches to measuring sentiment. A recent literature overview <span class="citation">(Pang and Lee 2008)</span> provides a comprehensive, domain-independent survey.</p>
 <p>On the one hand, machine learning approaches are preferred when one strives for high prediction performance. However, machine learning usually works as a black-box, thereby making interpretations diffucult. On the other hand, dictionary-based approaches generate lists of positive and negative words. The respective occurrences of these words are then combined into a single sentiment score. Therefore, the underlying decisions become traceable and researchers can understand the factors that result in a specific sentiment.</p>
-<p>In addition, <code>SentimentAnalysis</code> allows one to generate tailored dictionaries. These are customized to a specific domain, improve prediction performance compared to pure dictionaries and allow full interpretability. Details of this methodology can be found in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2015)</span>.</p>
+<p>In addition, <code>SentimentAnalysis</code> allows one to generate tailored dictionaries. These are customized to a specific domain, improve prediction performance compared to pure dictionaries and allow full interpretability. Details of this methodology can be found in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2018)</span>.</p>
 <p>In the process of performing sentiment analysis, one must convert the running text into a machine-readable format. This is achieved by executing a series of preprocessing operations. First, the text is tokenized into single words, followed by what are common preprocessing steps: stopword removal, stemming, removal of punctuation and conversion to lower-case. These operations are also conducted by default in <code>SentimentAnalysis</code>, but can be adapted to one’s personal needs.</p>
 </div>
 <div id="setup-of-the-sentimentanalysis-package" class="section level1">
@@ -152,7 +177,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1>Brief demonstration</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Analyze a single string to obtain a binary response (positive / negative)</span>
 sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(<span class="st">&quot;Yeah, this was a great soccer game for the German team!&quot;</span>)
-<span class="kw">convertToBinaryResponse</span>(sentiment)$SentimentQDAP</code></pre></div>
+<span class="kw">convertToBinaryResponse</span>(sentiment)<span class="op">$</span>SentimentQDAP</code></pre></div>
 <pre><code>## [1] positive
 ## Levels: negative positive</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a vector of strings</span>
@@ -167,56 +192,56 @@ documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="s
 sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(documents)
 
 <span class="co"># Extract dictionary-based sentiment according to the QDAP dictionary</span>
-sentiment$SentimentQDAP</code></pre></div>
+sentiment<span class="op">$</span>SentimentQDAP</code></pre></div>
 <pre><code>## [1]  0.3333333  0.5000000  0.5000000 -0.3333333  0.0000000 -0.4000000</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># View sentiment direction (i.e. positive, neutral and negative)</span>
-<span class="kw">convertToDirection</span>(sentiment$SentimentQDAP)</code></pre></div>
+<span class="kw">convertToDirection</span>(sentiment<span class="op">$</span>SentimentQDAP)</code></pre></div>
 <pre><code>## [1] positive positive positive negative neutral  negative
 ## Levels: negative neutral positive</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">response &lt;-<span class="st"> </span><span class="kw">c</span>(+<span class="dv">1</span>, +<span class="dv">1</span>, +<span class="dv">1</span>, -<span class="dv">1</span>, <span class="dv">0</span>, -<span class="dv">1</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">response &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>)
 
 <span class="kw">compareToResponse</span>(sentiment, response)</code></pre></div>
-<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
-<pre><code>## Warning in cor(x, y): the standard deviation is zero
+<pre><code>## Warning in cor(sentiment, response): Standardabweichung ist Null</code></pre>
+<pre><code>## Warning in cor(x, y): Standardabweichung ist Null
 
-## Warning in cor(x, y): the standard deviation is zero</code></pre>
-<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
-<pre><code>##                              WordCount SentimentGI NegativityGI
-## cor                        -0.18569534   0.9900115  -0.99748901
-## cor.t.statistic            -0.37796447  14.0440465 -28.16913204
-## cor.p.value                -0.37796447  14.0440465 -28.16913204
-## lm.t.value                 -0.37796447  14.0440465 -28.16913204
-## r.squared                   0.03448276   0.9801228   0.99498433
-## RMSE                        3.82970843   0.4501029   1.18665418
-## MAE                         3.33333333   0.4000000   1.10000000
-## Accuracy                    0.66666667   1.0000000   0.66666667
-## Precision                          NaN   1.0000000          NaN
-## Sensitivity                 0.00000000   1.0000000   0.00000000
-## Specificity                 1.00000000   1.0000000   1.00000000
-## F1                          0.00000000   0.5000000   0.00000000
-## BalancedAccuracy            0.50000000   1.0000000   0.50000000
-## avg.sentiment.pos.response  3.25000000   0.3333333   0.08333333
-## avg.sentiment.neg.response  4.00000000  -0.6333333   0.63333333
+## Warning in cor(x, y): Standardabweichung ist Null</code></pre>
+<pre><code>## Warning in cor(sentiment, response): Standardabweichung ist Null</code></pre>
+<pre><code>##                              WordCount  SentimentGI  NegativityGI
+## cor                        -0.18569534  0.990011498 -9.974890e-01
+## cor.t.statistic            -0.37796447 14.044046450 -2.816913e+01
+## cor.p.value                 0.72465864  0.000149157  9.449687e-06
+## lm.t.value                 -0.37796447 14.044046450 -2.816913e+01
+## r.squared                   0.03448276  0.980122766  9.949843e-01
+## RMSE                        3.82970843  0.450102869  1.186654e+00
+## MAE                         3.33333333  0.400000000  1.100000e+00
+## Accuracy                    0.66666667  1.000000000  6.666667e-01
+## Precision                          NaN  1.000000000           NaN
+## Sensitivity                 0.00000000  1.000000000  0.000000e+00
+## Specificity                 1.00000000  1.000000000  1.000000e+00
+## F1                          0.00000000  0.500000000  0.000000e+00
+## BalancedAccuracy            0.50000000  1.000000000  5.000000e-01
+## avg.sentiment.pos.response  3.25000000  0.333333333  8.333333e-02
+## avg.sentiment.neg.response  4.00000000 -0.633333333  6.333333e-01
 ##                            PositivityGI SentimentHE NegativityHE
-## cor                           0.9429542   0.4152274 -0.083045480
-## cor.t.statistic               5.6647055   0.9128709 -0.166666667
-## cor.p.value                   5.6647055   0.9128709 -0.166666667
-## lm.t.value                    5.6647055   0.9128709 -0.166666667
-## r.squared                     0.8891626   0.1724138  0.006896552
-## RMSE                          0.7136240   0.8416254  0.922958207
-## MAE                           0.6666667   0.7500000  0.888888889
-## Accuracy                      0.6666667   0.6666667  0.666666667
+## cor                         0.942954167   0.4152274 -0.083045480
+## cor.t.statistic             5.664705543   0.9128709 -0.166666667
+## cor.p.value                 0.004788521   0.4129544  0.875718144
+## lm.t.value                  5.664705543   0.9128709 -0.166666667
+## r.squared                   0.889162562   0.1724138  0.006896552
+## RMSE                        0.713624032   0.8416254  0.922958207
+## MAE                         0.666666667   0.7500000  0.888888889
+## Accuracy                    0.666666667   0.6666667  0.666666667
 ## Precision                           NaN         NaN          NaN
-## Sensitivity                   0.0000000   0.0000000  0.000000000
-## Specificity                   1.0000000   1.0000000  1.000000000
-## F1                            0.0000000   0.0000000  0.000000000
-## BalancedAccuracy              0.5000000   0.5000000  0.500000000
-## avg.sentiment.pos.response    0.4166667   0.1250000  0.083333333
-## avg.sentiment.neg.response    0.0000000   0.0000000  0.000000000
+## Sensitivity                 0.000000000   0.0000000  0.000000000
+## Specificity                 1.000000000   1.0000000  1.000000000
+## F1                          0.000000000   0.0000000  0.000000000
+## BalancedAccuracy            0.500000000   0.5000000  0.500000000
+## avg.sentiment.pos.response  0.416666667   0.1250000  0.083333333
+## avg.sentiment.neg.response  0.000000000   0.0000000  0.000000000
 ##                            PositivityHE SentimentLM NegativityLM
 ## cor                           0.3315938   0.7370455  -0.40804713
 ## cor.t.statistic               0.7029595   2.1811142  -0.89389841
-## cor.p.value                   0.7029595   2.1811142  -0.89389841
+## cor.p.value                   0.5208394   0.0946266   0.42189973
 ## lm.t.value                    0.7029595   2.1811142  -0.89389841
 ## r.squared                     0.1099545   0.5432361   0.16650246
 ## RMSE                          0.8525561   0.7234178   0.96186547
@@ -230,37 +255,37 @@ sentiment$SentimentQDAP</code></pre></div>
 ## avg.sentiment.pos.response    0.2083333   0.2500000   0.08333333
 ## avg.sentiment.neg.response    0.0000000  -0.1000000   0.10000000
 ##                            PositivityLM RatioUncertaintyLM SentimentQDAP
-## cor                           0.6305283                 NA     0.9865356
-## cor.t.statistic               1.6247248                 NA    12.0642877
-## cor.p.value                   1.6247248                 NA    12.0642877
-## lm.t.value                    1.6247248                 NA    12.0642877
-## r.squared                     0.3975659                 NA     0.9732526
-## RMSE                          0.7757911          0.9128709     0.5398902
-## MAE                           0.7222222          0.8333333     0.4888889
-## Accuracy                      0.6666667          0.6666667     1.0000000
-## Precision                           NaN                NaN     1.0000000
-## Sensitivity                   0.0000000          0.0000000     1.0000000
-## Specificity                   1.0000000          1.0000000     1.0000000
-## F1                            0.0000000          0.0000000     0.5000000
-## BalancedAccuracy              0.5000000          0.5000000     1.0000000
-## avg.sentiment.pos.response    0.3333333          0.0000000     0.3333333
-## avg.sentiment.neg.response    0.0000000          0.0000000    -0.3666667
+## cor                           0.6305283                 NA  0.9865356369
+## cor.t.statistic               1.6247248                 NA 12.0642877257
+## cor.p.value                   0.1795458                 NA  0.0002707131
+## lm.t.value                    1.6247248                 NA 12.0642877257
+## r.squared                     0.3975659                 NA  0.9732525629
+## RMSE                          0.7757911          0.9128709  0.5398902495
+## MAE                           0.7222222          0.8333333  0.4888888889
+## Accuracy                      0.6666667          0.6666667  1.0000000000
+## Precision                           NaN                NaN  1.0000000000
+## Sensitivity                   0.0000000          0.0000000  1.0000000000
+## Specificity                   1.0000000          1.0000000  1.0000000000
+## F1                            0.0000000          0.0000000  0.5000000000
+## BalancedAccuracy              0.5000000          0.5000000  1.0000000000
+## avg.sentiment.pos.response    0.3333333          0.0000000  0.3333333333
+## avg.sentiment.neg.response    0.0000000          0.0000000 -0.3666666667
 ##                            NegativityQDAP PositivityQDAP
-## cor                           -0.94433955      0.9429542
-## cor.t.statistic               -5.74114834      5.6647055
-## cor.p.value                   -5.74114834      5.6647055
-## lm.t.value                    -5.74114834      5.6647055
-## r.squared                      0.89177719      0.8891626
-## RMSE                           1.06840137      0.7136240
-## MAE                            1.01111111      0.6666667
-## Accuracy                       0.66666667      0.6666667
+## cor                          -0.944339551    0.942954167
+## cor.t.statistic              -5.741148345    5.664705543
+## cor.p.value                   0.004560908    0.004788521
+## lm.t.value                   -5.741148345    5.664705543
+## r.squared                     0.891777188    0.889162562
+## RMSE                          1.068401367    0.713624032
+## MAE                           1.011111111    0.666666667
+## Accuracy                      0.666666667    0.666666667
 ## Precision                             NaN            NaN
-## Sensitivity                    0.00000000      0.0000000
-## Specificity                    1.00000000      1.0000000
-## F1                             0.00000000      0.0000000
-## BalancedAccuracy               0.50000000      0.5000000
-## avg.sentiment.pos.response     0.08333333      0.4166667
-## avg.sentiment.neg.response     0.36666667      0.0000000</code></pre>
+## Sensitivity                   0.000000000    0.000000000
+## Specificity                   1.000000000    1.000000000
+## F1                            0.000000000    0.000000000
+## BalancedAccuracy              0.500000000    0.500000000
+## avg.sentiment.pos.response    0.083333333    0.416666667
+## avg.sentiment.neg.response    0.366666667    0.000000000</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compareToResponse</span>(sentiment, <span class="kw">convertToBinaryResponse</span>(response))</code></pre></div>
 <pre><code>##                            WordCount SentimentGI NegativityGI PositivityGI
 ## Accuracy                   0.6666667   1.0000000   0.66666667    0.6666667
@@ -307,8 +332,8 @@ sentiment$SentimentQDAP</code></pre></div>
 ## BalancedAccuracy                0.5000000
 ## avg.sentiment.pos.response      0.4166667
 ## avg.sentiment.neg.response      0.0000000</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(sentiment$SentimentQDAP, response)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(sentiment<span class="op">$</span>SentimentQDAP, response)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>The <code>SentimentAnalysis</code> package works very cleverly and neatly here in order to remove the effort for the user: it recognizes that the user has inserted a vector of strings and thus automatically performs a set of default preprocessing operations from text mining. Hence, it tokenizes each document and finally converts the input into a document-term matrix. All of the previous operations are undertaken without manual specification. The <code>analyzeSentiment()</code> routine also accepts other input formats in case the user has already performed a preprocessing step or wants to implement a specific set of operations.</p>
 </div>
 <div id="functionality" class="section level1">
@@ -328,7 +353,7 @@ sentiment$SentimentQDAP</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;This is good&quot;</span>,
                <span class="st">&quot;This is bad&quot;</span>,
                <span class="st">&quot;This is inbetween&quot;</span>)
-<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(documents)$SentimentQDAP)</code></pre></div>
+<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(documents)<span class="op">$</span>SentimentQDAP)</code></pre></div>
 <pre><code>## [1] positive negative neutral 
 ## Levels: negative neutral positive</code></pre>
 </div>
@@ -337,14 +362,14 @@ sentiment$SentimentQDAP</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tm)</code></pre></div>
 <pre><code>## Loading required package: NLP</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(<span class="kw">VectorSource</span>(documents))
-<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(corpus)$SentimentQDAP)</code></pre></div>
+<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(corpus)<span class="op">$</span>SentimentQDAP)</code></pre></div>
 <pre><code>## [1] positive negative neutral 
 ## Levels: negative neutral positive</code></pre>
 </div>
 <div id="corpus-object" class="section level3">
 <h3>Corpus object</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtm &lt;-<span class="st"> </span><span class="kw">preprocessCorpus</span>(corpus)
-<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(dtm)$SentimentQDAP)</code></pre></div>
+<span class="kw">convertToDirection</span>(<span class="kw">analyzeSentiment</span>(dtm)<span class="op">$</span>SentimentQDAP)</code></pre></div>
 <pre><code>## [1] positive negative neutral 
 ## Levels: negative neutral positive</code></pre>
 <p>Since the package can work directly with a document-term matrix, this allows one to use customized preprocessing operations in the first place. Afterwards, one can utilize the <code>SentimentAnalysis</code> package for the computation of sentiment scores. For instance, one can replace the stopwords with those from a different list, or even perform tailored synonym merging, among other options. By default, the package uses the built-in routines <code>transformIntoCorpus()</code> to convert the input into a <code>Corpus</code> object and <code>preprocessCorpus()</code> to convert it into a <code>DocumentTermMatrix</code>.</p>
@@ -424,7 +449,7 @@ d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<spa
 <div id="sentimentdictionaryweighted" class="section level3">
 <h3>SentimentDictionaryWeighted</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryWeighted</span>(<span class="kw">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),
-                                 <span class="kw">c</span>(+<span class="dv">1</span>, -<span class="dv">1</span>, -<span class="dv">10</span>),
+                                 <span class="kw">c</span>(<span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">10</span>),
                                  <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">3</span>))
 <span class="kw">summary</span>(d)</code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
@@ -442,7 +467,7 @@ d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<spa
 ## Skewness:           -0.6155602</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Alternative call</span>
 d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<span class="kw">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),
-                         <span class="kw">c</span>(+<span class="dv">1</span>, -<span class="dv">1</span>, -<span class="dv">10</span>),
+                         <span class="kw">c</span>(<span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">10</span>),
                          <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">3</span>))
 <span class="kw">summary</span>(d)                         </code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
@@ -463,14 +488,14 @@ d &lt;-<span class="st"> </span><span class="kw">SentimentDictionary</span>(<spa
 </div>
 <div id="dictionary-generation" class="section level1">
 <h1>Dictionary generation</h1>
-<p>The following example shows how the <code>SentimentAnalysis</code> package can extract statistically relevant textual drivers based on an exogenous response variable. The details of this method are presented in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2015)</span>, while we provide a brief summary here. Let  denote a response variable in the form of a vector. Furthermore, variables  give the number of occurrences of word  in a document. The methodology then estimates a linear model  with intercept  and coefficients . The estimation routine is based on LASSO regularization, which implicitly performs variable selection. In so doing, it sets some of the coefficients  to exactly zero. The remaining words can then be ranked by polarity according to their coefficient.</p>
+<p>The following example shows how the <code>SentimentAnalysis</code> package can extract statistically relevant textual drivers based on an exogenous response variable. The details of this method are presented in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2018)</span>, while we provide a brief summary here. Let  denote a response variable in the form of a vector. Furthermore, variables  give the number of occurrences of word  in a document. The methodology then estimates a linear model  with intercept  and coefficients . The estimation routine is based on LASSO regularization, which implicitly performs variable selection. In so doing, it sets some of the coefficients  to exactly zero. The remaining words can then be ranked by polarity according to their coefficient.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a vector of strings</span>
 documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;This is a good thing!&quot;</span>,
                <span class="st">&quot;This is a very good thing!&quot;</span>,
                <span class="st">&quot;This is okay.&quot;</span>,
                <span class="st">&quot;This is a bad thing.&quot;</span>,
                <span class="st">&quot;This is a very bad thing.&quot;</span>)
-response &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, -<span class="fl">0.5</span>, -<span class="dv">1</span>)
+response &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="dv">1</span>)
 
 <span class="co"># Generate dictionary with LASSO regularization</span>
 dict &lt;-<span class="st"> </span><span class="kw">generateDictionary</span>(documents, response)
@@ -535,24 +560,24 @@ dict &lt;-<span class="st"> </span><span class="kw">read</span>(<span class="st"
 ## [1] 1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sentiment &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, documents)
 <span class="kw">compareToResponse</span>(sentiment, response)</code></pre></div>
-<pre><code>##                            Dictionary
-## cor                         0.9486833
-## cor.t.statistic             5.1961524
-## cor.p.value                 5.1961524
-## lm.t.value                  5.1961524
-## r.squared                   0.9000000
-## RMSE                        0.2330104
-## MAE                         0.2000111
-## Accuracy                    1.0000000
-## Precision                   1.0000000
-## Sensitivity                 1.0000000
-## Specificity                 1.0000000
-## F1                          0.5714286
-## BalancedAccuracy            1.0000000
-## avg.sentiment.pos.response  0.4511680
-## avg.sentiment.neg.response -0.6767520</code></pre>
+<pre><code>##                             Dictionary
+## cor                         0.94868330
+## cor.t.statistic             5.19615237
+## cor.p.value                 0.01384683
+## lm.t.value                  5.19615237
+## r.squared                   0.90000000
+## RMSE                        0.23301039
+## MAE                         0.20001111
+## Accuracy                    1.00000000
+## Precision                   1.00000000
+## Sensitivity                 1.00000000
+## Specificity                 1.00000000
+## F1                          0.57142857
+## BalancedAccuracy            1.00000000
+## avg.sentiment.pos.response  0.45116801
+## avg.sentiment.neg.response -0.67675202</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(sentiment, response)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAulBMVEUAAAAAACsAAFUAK4AAVaorAAArACsrgNQzMzMzZv89PT1NTU1NTWtNTYhNa6ZNiMRVAABVqv9rTWtrTYhra4hra6ZrpuGAKwCAqoCA1P+ITU2ITWuITYiIa02IxP+ma02ma2uma4imxKam4eGm4f+qVQCqgCuq1P+q///EiE3E///KysrUgCvUgIDU/6rU///W1tbhpmvh///r6+v/qlX/xIj/1ID/1Kr/4ab//6r//8T//9T//+H///9QDR4eAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAMh0lEQVR4nO2dC3/ctg3AldiJa1/W2t0WL3v0tXhLam9RWsdLYt/3/1qT5POJFEE8RFLkicCvTe3DoQT+ASkJJMVmq4JKk9uB0kUBEaKACFFAhCggQhQQIfMAfVOBhAECP/0dN8LVpRkrIEKrgAitAiK0CojQKiBCq4AIrQIitAqI0CogQquAIG07/qiAAG2rgFBtq4BQbauAUG2rgFBtq4AwbdsqIEzbKiBU24YA+vzHX4f/fv3r5tvfptZR3cxm3IYA+rT5wwDo4ccfth+/m1rHdDOb8fXI56zZ82ACev/ql8cM+vr3X/fJtC5A7QjorAP0BETaxT7/+bft17+93e6mfH5fjVwbMgDafS4F9OnbJ0AmXlsOMIP6vImdQaZ1JDezGbc2oBlj0B7QKsegdgoo4DL/8OPr1V3F2miA+n/Xdx/UxgEEyhoAtQoIVbcKCFMbTBQQoG4VEKpuFRCqbhUQpm6nooAUkMTY4aOALLXLRwGZaoCPAhrVEB4FNKphPgpop/bgUUA7tZePAhrUfj4KqFcjfNIAyjpTI5ZrppyejjY1ZZCVI0gGnXayN6oIUMsE1OGpcgxqmYB6PjUCmg7DHkCnA58KAdmjjBfQjk99gOxRxgfoCU91gCajjA/QyKcyQPYo4xMDT2WA7FEGwTPyqQqQ2YlQPnU+i1kYvICG7KkSkM3BB+ixd1UIaAoCBvQ0+tQHyEEBAtqPztUBclkAgIyLV22AgGRxAZkX97oAQZ3JAWTf+1QFCOQzATS5N6wKEMzHBjTBUxUgDx8LwRRPIKBx8e/HzWa38WdbKCAfHguByycIkLEJ6v0PxuclAvLzscvyGD7xVoRxA8LDT2+NzwsEhPAxy/Iun6DNLOMWlq6vbTZDEpW5HYo169U9uaMi3w41boL6/P1bI4uKyyAsf+yyfKoMGmQ/DpUGCK+p9gi8eGKNQYOUCogoOj9WnX18Aq9iT5ug+s728HORl/kWqYg9CoYnyn1Qn0TdfdCrfV8rCdA0RiGetd9JuzFK+awaEBSjy4e7umN9gMAYXT61AvLEOMEzLcvXA8gXo8unTkDeGB08dQLyx2jggcrydQDCYhz5YPxgYyDEgwSEJoGDhw0IDNEGdNM0FzdHH3Bft5kB4UkA8OEB8oRoAbo6+u/5xf3lMe7rNi8gNAme+KD8AGN/iCagL+cX3T/b2+fvcGezAsKSwMOHBoSEeGiA/Ekw4kHL8oAxGqLVxW76Lvbl/AT3dZsPEJIECB8ckKdleJC+bTqh+eQC5E8CDA8GyN/yIV7m/VlwvccDVja8gJCWDxCQnw9RlfcCwloGAQ2jdEOP0TkAIXioqjwMiGgZvg863t48f3fDuA8qbtaLnvSyhG7Sc5nv7xLLu8wjvWSXInhZ1TFmtOy9DzopD5C3l+xFUJZ3+AgA3V+e3D5703c0ShYFBCeBjYdflnfvmgVj0N2L5rh7ICvqYdWTBBI+noIG3vKhXObBJJjQoaYtDDW/5cMABCaBy4cLSOKXr4v1UsogDSfBhA+GzzIW+gUP0vTwbFtzWmKq8WkLEAG3Ku+p+OB+eS7zeIiONaclphqvygsWy8OAxH7BGVQOICgJHD4YPlPmXB7AMYhxi2hbc1piqvFpCxeBd7H8VIQtPwncxZoiBmkoTLwsjwAStWxIwZd5ME53NwGCb8JnXYA8gU6qzrxpC1nLtnjnxTKXXH2ZYFededMWspYnAhft+9Ena9Hex8daLI/hg/hEHKSHy3y2coeXzoiAXZWXtQxIgYAwPkZZHsHn4bOSLoby2ZflMXwePEkH6XE7VNpTEViPU6zF8tBTRbrL/LgdKu3pUG4STOTsbMZieaZjIYDGrQgpT2Zxk8Dhc4ryISpisbuY8cQ6bmZJeDoUY5amp3MWZTaHLbxBetwOle50KKCXTKXHc3aGfAFeA8V0LOQyD2WQaS3xA1RDvUTOhygZJgSUegxykwDEw1gsL22Z1ML1oGdv7C42bodKcTqUmwRePrPWQDEdk9eDjJLQuB0q+n2QkwQIHgpQggmn7OUOJwlQPkRJbH2A3DDxqvysRWJMxwSAllofBMUJFZ0ZZXlhy3xt4PqgGX6MajDSeYvlhS0LtPnWB3lSwa3Ko/wsPgsCSr0+yEPHIcCpOstalmqzrA/y47EJsKrOopbl2hzrgzA+4sXyopZnaJe/zHM3JVGvaAH4rAEQlAQgAVZZXtIyqRbWg9LsF4OSACLAeEWLvGQY8T4o0X4xKAkgAkjZcM4qOqZaeJmPvh0KSgKYAKvqLGiZqc4LCEwCmADrFS2SGJlqybxY9P1iYBLABDiL5WUxMtWSQTryfjE4CUBhvcNGGCNTne0yDyfBPD6z1mEy1XJA/4kyBsFJ4MVDzazOiJGpZgO6apr+Av/lnDFIx5jssma9Fpzx4okL6Ob5u+5ptR+G6LWuRAb5e4knfdD8avvONScJmGpmBvVwtrdH/2oYN9I4IG8v8eEhX2EzM0ammglomBTrHucZ1zAckDfM2Yvl58bIVMsAsfgggJA8ANeCM6vyxQB6+QZvamI9aQmhAyEQVOVXAYi/a2vPB8Nn8VkDIPauLZBPioWqQcYAIGfe2S8uICQJQATOrTNkHBhjkHHcRw0kCWAErMXyoTEGGUcEhCYBiID3CpvgGIOMYwEikgBSw3VDvCpfE6BZVfl6AHGq8rGWOgcZZwLEeoVNrBiDjPMAYq0FjxZjkHEWQJy14KIoeNpDAYSXVRMsdQ4yXh4QUXbGpy3WD4j3ChtpFDztAQA6pcvy1+jbEYoFRB6fxQKUabF8kLF0v5jn+KzG3EOBV+WXXywfZCzdLwYfn9U05i6T0hbLBxnzAFHHZw2AyEkvxtTY4tNepPAAUcdn0RnEKssn2k0QZEwDer/ZfEcen0WMQayyPGfaokRAvdDHZ5mB4tMWy+8mCDLmXsWo47MQQMxXtKSLMchYdB+EHJ/lJeDWDRffTRBknPpOmvmKFm4QawPEqjq3gnmdlQHiLZZPvpsgyDgloFmvaKkIEKssP+VTDyBWWd7lUw0gpDC2+H6UIOMkgLivaJFPfK0DEM5n+Q07QcYJALGqzj4+6wdEVuWX37ATZBwbEGexPIJn9YAYVfnlN+wEGccFxHmFzfL7UYKMYwLiTVsQM18rBsSctiBmvtYKyLz3KW1HU5BxIKD97AhnK1OpMzuoLL+6Y/kkCDJeHFCGGIOMlwY0002m+vABzXWTqT50QPPdZKoPHFCAm0z1QQMKcjOf8WKAwtzMZ7wUoEA38xkvBCjUzXzGiwAKdzOfsQIitEsAiuBmPuMFAMVwM59xekBR3MxnnBpQJDfzGScGFMvNfMZJAUkc4WnXBUjkCE+7KkAyR3jaggE9rSP3HBvhAorqZj5jLqBPu01inuOz3K0Icd3MZ8wE9P7VL48ZBB9d425miexmPmNpF4OPz3K2Q2WdyooqUkDw8VmTDML/T2vLoH471BbIINPaHoNKizHIWJpBvuOzzKeL0mIMMpYC8h2fZT5dlBZjkLEIEHJ8lvl0UVqMQcax76RpP+oGxPCjakAcP2oGxPKjXkBMP6oFxPWjUkB8PxRQcTEGGSsgQquACK0CIrQKiNAqIEKrgAitAiK0CojQKiBCGwioAgkCNI/qQRorIEIUECELAjpMUUCEKCBCFBAhCoiQRQCZ09b9UrVZptbcd/J297IEIGv53seNxNHR1F4DmLrdUZYAZC6d+fynf0gcHU0nLyZO3O4oSwAyFl89/PRPUaqPppNXWydud5QlABnL9z6+lo0Fo6m9BjB1u6OkBmS/17z7SeZopAwStzvKsmNQfzjHZvN6jmnQGCRud5RlrmLG8j3Z3+Roaq8BTN3uKAveB+0O6JhzH+SsAUze7l70TpoQBUSIAiJEARGigAhRQIQoIEKKAXTTNM0z6LT7//17e/cSUtjfSSWlALrpD7m/bS4cBQmH+Z25Ugig+8sBzdXRh6lGAQ1yf3ky/tg0XTrdvfzLi6a5uOv+OOkAPP560v96AX4nlWeFAOp61y7G+8vjrsMdfbh70WVT1/H67OgBDb82j59B30klpQB6HKW7uG/7wejLeZcWF0Pf2QPqf919Bn0nlZQDaNvHfPSh59Q8disL0O7X4Q/oO6mkKEBD8LtxGgUEfCeVFAJoF2LffXY3Qxgg6DuppBBA26s+5n7wvb/s0qMj8BR8N9Q4gKDvpJJSAA1j9HAh6y/hz97sYWyvmuMpIOg7qfwqBlCpooAIUUCEKCBCFBAhCogQBUSIAiJEARGigAj5P0V7hsdchVe5AAAAAElFTkSuQmCC" /><!-- --></p>
 <p>The following example demonstrates how a calculated dictionary can be used for predicting the sentiment of out-of-sample data. In addition, the code then evaluates the prediction performance by comparing it to the built-in dictionaries.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test_documents &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;This is neither good nor bad&quot;</span>,
                     <span class="st">&quot;What a good idea!&quot;</span>,
@@ -565,7 +590,7 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 <pre><code>##                              Dictionary
 ## cor                        5.922189e-05
 ## cor.t.statistic            5.922189e-05
-## cor.p.value                5.922189e-05
+## cor.p.value                9.999623e-01
 ## lm.t.value                 5.922189e-05
 ## r.squared                  3.507232e-09
 ## RMSE                       8.523018e-01
@@ -579,21 +604,21 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 ## avg.sentiment.pos.response 1.457684e-05
 ## avg.sentiment.neg.response          NaN</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentimentResponse</span>(pred, test_response)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compareToResponse</span>(<span class="kw">analyzeSentiment</span>(test_documents), test_response)</code></pre></div>
-<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
-<pre><code>## Warning in cor(x, y): the standard deviation is zero
+<pre><code>## Warning in cor(sentiment, response): Standardabweichung ist Null</code></pre>
+<pre><code>## Warning in cor(x, y): Standardabweichung ist Null
 
-## Warning in cor(x, y): the standard deviation is zero
+## Warning in cor(x, y): Standardabweichung ist Null
 
-## Warning in cor(x, y): the standard deviation is zero
+## Warning in cor(x, y): Standardabweichung ist Null
 
-## Warning in cor(x, y): the standard deviation is zero</code></pre>
-<pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
+## Warning in cor(x, y): Standardabweichung ist Null</code></pre>
+<pre><code>## Warning in cor(sentiment, response): Standardabweichung ist Null</code></pre>
 <pre><code>##                             WordCount SentimentGI NegativityGI
 ## cor                        -0.8660254 -0.18898224   0.18898224
 ## cor.t.statistic            -1.7320508 -0.19245009   0.19245009
-## cor.p.value                -1.7320508 -0.19245009   0.19245009
+## cor.p.value                 0.3333333  0.87896228   0.87896228
 ## lm.t.value                 -1.7320508 -0.19245009   0.19245009
 ## r.squared                   0.7500000  0.03571429   0.03571429
 ## RMSE                        1.8257419  1.19023807   0.60858062
@@ -609,7 +634,7 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 ##                            PositivityGI SentimentHE NegativityHE
 ## cor                         -0.18898224 -0.18898224           NA
 ## cor.t.statistic             -0.19245009 -0.19245009           NA
-## cor.p.value                 -0.19245009 -0.19245009           NA
+## cor.p.value                  0.87896228  0.87896228           NA
 ## lm.t.value                  -0.19245009 -0.19245009           NA
 ## r.squared                    0.03571429  0.03571429           NA
 ## RMSE                         0.67357531  0.67357531    0.8164966
@@ -625,7 +650,7 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 ##                            PositivityHE SentimentLM NegativityLM
 ## cor                         -0.18898224 -0.18898224   0.18898224
 ## cor.t.statistic             -0.19245009 -0.19245009   0.19245009
-## cor.p.value                 -0.19245009 -0.19245009   0.19245009
+## cor.p.value                  0.87896228  0.87896228   0.87896228
 ## lm.t.value                  -0.19245009 -0.19245009   0.19245009
 ## r.squared                    0.03571429  0.03571429   0.03571429
 ## RMSE                         0.67357531  1.19023807   0.60858062
@@ -641,7 +666,7 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 ##                            PositivityLM RatioUncertaintyLM SentimentQDAP
 ## cor                         -0.18898224                 NA   -0.18898224
 ## cor.t.statistic             -0.19245009                 NA   -0.19245009
-## cor.p.value                 -0.19245009                 NA   -0.19245009
+## cor.p.value                  0.87896228                 NA    0.87896228
 ## lm.t.value                  -0.19245009                 NA   -0.19245009
 ## r.squared                    0.03571429                 NA    0.03571429
 ## RMSE                         0.67357531          0.8164966    1.19023807
@@ -657,7 +682,7 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 ##                            NegativityQDAP PositivityQDAP
 ## cor                            0.18898224    -0.18898224
 ## cor.t.statistic                0.19245009    -0.19245009
-## cor.p.value                    0.19245009    -0.19245009
+## cor.p.value                    0.87896228     0.87896228
 ## lm.t.value                     0.19245009    -0.19245009
 ## r.squared                      0.03571429     0.03571429
 ## RMSE                           0.60858062     0.67357531
@@ -677,7 +702,7 @@ pred &lt;-<span class="st"> </span><span class="kw">predict</span>(dict, test_do
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(<span class="kw">VectorSource</span>(documents))
 tdm &lt;-<span class="st"> </span><span class="kw">TermDocumentMatrix</span>(corpus, 
                           <span class="dt">control=</span><span class="kw">list</span>(<span class="dt">wordLengths=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="ot">Inf</span>), 
-                                       <span class="dt">tokenize=</span>function(x) <span class="kw">ngram_tokenize</span>(x, <span class="dt">char=</span><span class="ot">FALSE</span>, 
+                                       <span class="dt">tokenize=</span><span class="cf">function</span>(x) <span class="kw">ngram_tokenize</span>(x, <span class="dt">char=</span><span class="ot">FALSE</span>, 
                                                                            <span class="dt">ngmin=</span><span class="dv">1</span>, <span class="dt">ngmax=</span><span class="dv">2</span>)))
 <span class="kw">rownames</span>(tdm)</code></pre></div>
 <pre><code>##  [1] &quot;a&quot;           &quot;a bad&quot;       &quot;a good&quot;      &quot;a very&quot;      &quot;bad&quot;        
@@ -688,24 +713,24 @@ tdm &lt;-<span class="st"> </span><span class="kw">TermDocumentMatrix</span>(cor
 <span class="kw">summary</span>(dict)</code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
 ## Total entries:    7
-## Positive entries: 3 (42.86%)
-## Negative entries: 4 (57.14%)
+## Positive entries: 4 (57.14%)
+## Negative entries: 3 (42.86%)
 ## Neutral entries:  0 (0%)
 ## 
 ## Details
-## Average score:      2.136424e-06
-## Median:             -5.891262e-05
-## Min:                -0.4368759
-## Max:                0.4380331
-## Standard deviation: 0.3016221
-## Skewness:           0.004124293</code></pre>
+## Average score:      5.814314e-06
+## Median:             1.602469e-16
+## Min:                -0.4372794
+## Max:                0.4381048
+## Standard deviation: 0.301723
+## Skewness:           0.00276835</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dict</code></pre></div>
 <pre><code>## Type: weighted (words with individual scores)
-## Intercept: -3.230431e-05
+## Intercept: -5.102483e-05
 ## -0.44 bad
 ## -0.29 very bad
-## -0.00 bad thing.
 ## -0.00 thing.
+##  0.00 thing!
 ##  0.00 good thing!
 ##  0.29 a good
 ##  0.44 good</code></pre>
@@ -743,12 +768,12 @@ sentiment</code></pre></div>
 <pre><code>##   GermanSentiment
 ## 1             0.0
 ## 2            -0.5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">convertToBinaryResponse</span>(sentiment$GermanSentiment)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">convertToBinaryResponse</span>(sentiment<span class="op">$</span>GermanSentiment)</code></pre></div>
 <pre><code>## [1] positive negative
 ## Levels: negative positive</code></pre>
 <p>Similarly, one can implement a dictionary with custom sentiment scores.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">woorden &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;goed&quot;</span>,<span class="st">&quot;slecht&quot;</span>)
-scores &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.8</span>,-<span class="fl">0.5</span>)
+scores &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.8</span>,<span class="op">-</span><span class="fl">0.5</span>)
 dictionaryDutch &lt;-<span class="st"> </span><span class="kw">SentimentDictionaryWeighted</span>(woorden, scores)
 documents &lt;-<span class="st"> &quot;dit is heel slecht&quot;</span>
 sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(documents,
@@ -774,21 +799,21 @@ sentiment</code></pre></div>
 sentiment &lt;-<span class="st"> </span><span class="kw">analyzeSentiment</span>(crude)
 
 <span class="co"># Count positive and negative news releases</span>
-<span class="kw">table</span>(<span class="kw">convertToBinaryResponse</span>(sentiment$SentimentLM))</code></pre></div>
+<span class="kw">table</span>(<span class="kw">convertToBinaryResponse</span>(sentiment<span class="op">$</span>SentimentLM))</code></pre></div>
 <pre><code>## 
 ## negative positive 
 ##       16        4</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># News releases with highest and lowest sentiment</span>
-crude[[<span class="kw">which.max</span>(sentiment$SentimentLM)]]$meta$heading</code></pre></div>
+crude[[<span class="kw">which.max</span>(sentiment<span class="op">$</span>SentimentLM)]]<span class="op">$</span>meta<span class="op">$</span>heading</code></pre></div>
 <pre><code>## [1] &quot;HOUSTON OIL &lt;HO&gt; RESERVES STUDY COMPLETED&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crude[[<span class="kw">which.min</span>(sentiment$SentimentLM)]]$meta$heading</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crude[[<span class="kw">which.min</span>(sentiment<span class="op">$</span>SentimentLM)]]<span class="op">$</span>meta<span class="op">$</span>heading</code></pre></div>
 <pre><code>## [1] &quot;DIAMOND SHAMROCK (DIA) CUTS CRUDE PRICES&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># View summary statistics of sentiment variable</span>
-<span class="kw">summary</span>(sentiment$SentimentLM)</code></pre></div>
+<span class="kw">summary</span>(sentiment<span class="op">$</span>SentimentLM)</code></pre></div>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## -0.08772 -0.04366 -0.02341 -0.02953 -0.01375  0.00000</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Visualize distribution of standardized sentiment variable</span>
-<span class="kw">hist</span>(<span class="kw">scale</span>(sentiment$SentimentLM))</code></pre></div>
+<span class="kw">hist</span>(<span class="kw">scale</span>(sentiment<span class="op">$</span>SentimentLM))</code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Compute cross-correlation </span>
 <span class="kw">cor</span>(sentiment[, <span class="kw">c</span>(<span class="st">&quot;SentimentLM&quot;</span>, <span class="st">&quot;SentimentHE&quot;</span>, <span class="st">&quot;SentimentQDAP&quot;</span>)])</code></pre></div>
@@ -797,12 +822,12 @@ crude[[<span class="kw">which.max</span>(sentiment$SentimentLM)]]$meta$heading</
 ## SentimentHE     0.2769878   1.0000000     0.6141075
 ## SentimentQDAP   0.4769730   0.6141075     1.0000000</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># crude oil news between  1987-02-26 until 1987-03-02</span>
-datetime &lt;-<span class="st"> </span><span class="kw">do.call</span>(c, <span class="kw">lapply</span>(crude, function(x) x$meta$datetimestamp))
+datetime &lt;-<span class="st"> </span><span class="kw">do.call</span>(c, <span class="kw">lapply</span>(crude, <span class="cf">function</span>(x) x<span class="op">$</span>meta<span class="op">$</span>datetimestamp))
 
-<span class="kw">plotSentiment</span>(sentiment$SentimentLM)</code></pre></div>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAmVBMVEUAAAAAACsAAFUAK4AAVaorAAArAFUrgNQzMzNNTU1NTWtNTYhNa6ZNiMRVAABVqv9rTU1rTWtrTYhra6ZrpuGAKwCA1P+ITU2ITWuITYiIxP+ma02ma2uma4imxKam4f+qVQCq///EiE3E///UgCvU/6rU///hpmvh///r6+v/qlX/xIj/1ID/4ab//6r//8T//9T//+H///+jvTWrAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJwklEQVR4nO2dfWPbJhDG2bpuc9cm7ZauW/aSLM3WOqmbVt//w83YssRxoAOELISe5x+5OnOcfkUIYbioBhqUmjuA0gVAggBIEAAJAiBBACQoC6Afa1RWQD7DNp/h3EUASLAAkGABIMECQIIFgAQLAAmWUEBP7zYvP5qf6IE6yxDh0gB9/eO6+fDK+EQPlrMMES4N0NPv75vdz+/7T/RgOcsQ4dIA7X752Dz9dtN/ooemfc3YxkpFl8gl1ctpPn0IBPT48gSi/UQPFu3w/ylvtZO3INUZnDF0J7O1INNZUITD1S4N0ER9kJoNkDIMjiBU/FPsqnuKXR0fX+bBchYS4bHWagC14x3dWHKOgyoCFKR4QFtfvQDUxgFARiCuOMoEpAp5Wd3HMRMgRQwsCAACIMECQIIFgATLMCBVyIyijgOAzEAcccwDSFkGxczFAPJVDEANABlaFiDVAJBlKBPQMY4iANEoAEgxAwCxmqkBgFjN1KBsKwBRAwCxmqmhREBtHGUAMsMoDJCn5ikBKYdhSYBogEG+hg1xgBS1AJB9blJAUcsr7HUUbGHFVHJVoHzW2VpQ9x9VRgvqT5Zyi3kBKQCicZwdkHIaFgSIvguF+BIMUYCUZakLkHIvFwGg5sBG06kGkBEHmxCOB3RgszX8DhVxAzqdrhKQ0a8C0LCvAEDKY1DEWi4g1QCQUV8OQPSaXBeyQEBmHCMBWZM7ACS8NyQDOhoWAahRswFSzLJ0QOyZLQFSPkOdgHhzqBAQqfvUEYQBclxtHYBoHIUAOj0fqGXRgJTDMAqQ3eM3ywakXAYA2pKvMoMAyNXoehsArQkQi3jrOb9AQFYcDFCjZgHER51NcYDU6SAC4gEDEPFVMyA7jhRAfgyDgJwjA38tzYjkJrvXm81103zYbDY/RW0LJ7/M2Fe7WEAsuYnOJrB7c9PcXRvfCgE0PPoNBTTwMJ8HEEss8Khp3V1//fPG+FYAIGH0u1hALDWFPrk/7O+3w50WmtzEvbSFrT2RVsAM2QfLxi+tSU1u0hxzMOi7rG9FUgviPwwntiBntLO1oLvN5pWjBT29uzp94dQPCYC8oXcG1R0HQ3cHW1YftH+Kdd1zICB/v8EAGRv7XUWSAblf3wacpSc3afnoG+7rX2GP+WyAPLF630HOAYglN9HjH909748vugfZmgEFaRDQQMcaB8gXasWAjM759AGASBwxgLyRrgCQMR4CIBIHAIWNXUIA+S0AJFhkQJ43nSFnACQ4cwL6fHGpDw/f/uMt71Y+QP7/sFoBDY9+wwENvMaeC9B9lwT2O29xj8oA5OeQuQXFayQg8ztFA0pWMqCjOQCQGrioMwL69Pxwi52vD1oYoC9vo3sf6oxXF/SCuRhAE/RBRQAaGGL7Le4WVCog1RQBKGEERJ3x6uoC9PlC5e6kQwCR77hLFAIoWV5AQVMUMiBlFvH6AiDB1zkA7V83Lu+f/ect7lEhgHzTPvkA3T779+IyYTSUDkh/YzmA9uMgPRTK+DafB5CiRby+lgdInsNZFqDmXt9iny9+8Bb3yLf8JWDRibK/5SgTvHZFWmQTI3cn/aCHQdF8xrUgGoGjBSmriNeXpwU52mQpj3kAspzZSgHEIyoIUOb5oLBZwAUByj0flAeQ6iySr8kB5Z4Pqg5Q7vmgEED2As+iAWWeDwqaBRQBqd4i+rLLFt5JBwKyDbkBuZ7TybdY/BiROKOqD1DmTro+QJk76SyAlGERfU0NqPn0fcZOWg0FMmAoGFDeSftUQPSKigKUrOkAKWIRfQGQ4GtKQIfpxOJusYIAjZELUOhEOzfkBeS8wHHjoDxz0lkAKWoRfQGQ5Mt+scsJKPMaxfoAZX7VyAFIWRbZ17SAkrUaQDmnO9IB9TGVBijnnLQaDmSZgHL2QTkA8asVfU3dguoD5O5jU/sgxwiIZX9p077055v1AHK8i7HsL202gf686YxFWhkgh1jmhTZhR3/edMYiHQXI9eYp+To7IJa7o0370p/3ZH8Z85eMAlPBDJUdH0fgGkWW/aVN+9KfN2kbmqkFsZFB3hZE1yh6sr9oy7X5r4kA2ZdWACDHEjye/UXr7nrSPuhYeBmAWPaXNu1Lf950xuKsDJBrjaKd/eWU9kUYB5UCyPMMSn6KZVujOB4Qu7QiACUKgAStBND9N78e3jaKuMX4lc0O6GHPR4+BUhaSszMVAjosDvr0/FI/y2K3+6wC0GG2TLeiLD/7zAbI+iEkN6BD48kA6OQ1EZAjdef8gPR04vE17Hb8LVYjIN16Dl3Qg4qeeC0WkG8Qk/aYv9VP+C9vdTcUqZUASld+QPFF7KoPFgDihnUAGlEEgAQDAAkGABIMiwDUOQUg6uykOQGZV+S9OABiH6NrASDBAkCCBYAEyxoABeQ18FvyAsq1pCKHFPuQpBW0oKBd6V7LlIB6n3MCUuNqqR6QGllL7YDU2FoASLDUC8j4ZR+AnIb+Z0cAchr6jDsA5DQAkGDof1QrFJDhcrZOenwtFQPKUwSABAsACRYAEiwAJFgASLAAkGABIMECQIJlOkB0FaUUR7ABgAQDAAkGABIMACQYAEgwAJBgKBWQndxE5zbRqRfaHCfUGfNYPyCe3KQ5JmE45jixnDGP9QNyJRbQGRfaHCeWM+awfkCu1BS6HbU5Thqe3GTWpS8ZFQiIJTc5NqCmzXFi0WYO625BnuQmj13Gha4fWikgLUcfdHd1MgKQI7lJe2O1OU4sZ8xh/YB4cpM2a1Cb44Q6Yw5XAChIACQIgAQBkCADEPUHQNQZ8wdA1BnzB0DUGfMHQNQZ8wdA1BnzB0DUGfMHQNQZ8wdA1BnzB0DUGXMHQNQZAHkEQIIASBAACQIgQQAkCIAEAZAgABLUAbK9ARB1BkAeAZCgbvlLLWtfthNnf+mEFkSdhQcCQEIgACQEAkBCIAAkBAJAQiAAJAQCQEIgACQEsjZANSonoASkiykCQEIRABKKzARoOQIgQQAkCIAEAZCgOQCRHdNBOmxUI389OaxITE2714dNpnYtcwAiO6ZD9Kiv0th2HVokpia9zWv35obVMgMgumM6QHcv/tb71chfcA8qElPTo6Zi/534ZhZA/Y7pYOmQ++2zwUVia9q7Z7XMAIjumA4rsr/afgN2cJHImvSuU1bLXE+xuH4osQXF1fT07qrhtSwHUFQflABo91p/sYQ+iO6YDpIOud+AHVwkpqYjH17LTOOgF3EPshHjoNCaTmltShgHLUoAJAiABAGQIAASBECCAEgQAAkCIEEAJAiABAGQIAASBECCAEgQAAkCIEEAJAiABAGQIAASBECCAEgQAAkCIEEAJOh/3k738L7UI1oAAAAASUVORK5CYII=" /><!-- --></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentiment</span>(sentiment$SentimentLM, <span class="dt">x=</span>datetime, <span class="dt">cumsum=</span><span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<span class="kw">plotSentiment</span>(sentiment<span class="op">$</span>SentimentLM)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotSentiment</span>(sentiment<span class="op">$</span>SentimentLM, <span class="dt">x=</span>datetime, <span class="dt">cumsum=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAA1VBMVEUAAAAAACsAAFUAK4AAVaorAAArAFUrgNQzMzNNTU1NTWtNTYhNa6ZNiMRVAABVqv9rTU1rTWtrTYhra4hra6ZriKZriMRrpuGAKwCA1P+ITU2ITWuITYiIa02Ia2uIa6aIiE2IiGuIiIiIiMSIxP+ma02ma2uma4imiE2miKampoimxKam4eGm4f+qVQCq///EiE3EiGvExIjE4abE/+HE///UgCvU/6rU///hpmvhpojh/8Th///r6+v/qlX/xIj/1ID/4ab//6r//8T//9T//+H///+llnI5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAIeUlEQVR4nO2di1fcRBjFo7XKUsqrKhVbH3XxDW6toChlGxby//9JZvKcfJnJnTxJsvcez2FPr/dj8tvJJBmSiRdQlfIeuwFjFwEBERAQAQEREBABATUDtLMFagfI8u/vrYkmznAhg0NAwCEg4BAQcAgIOAQEHAICDgEBh4CA0xWgYp6ARJqALCIgIAICIiAgAgLaeZ/Jez9PdXYeVCjAHiTSsgABibQsQEAiLQsQkEjLAgQk0rIAAYm0LEBAIi0LEJBIywIEJNKyAgGJtKxAQCItKxCQSMsKBCTSsgIBibSsQEAiLSsQkEjLCgQk0rICAYm0rEBAIi1LEJBIyxIEJNKyBAGJtCxBQCItSxCQSMsSBCTSsgQBibQsQUAiLUsQkEjLEgQk0rIEAYm0LEFAIi1LEJBIyxIEJNKyBAGJdFwiUv0mQGcugJJCGie3JkBnXoCSX2TjREDFX1TiNFdAm9PF3k30yT9cLJYyjX5RjmmmgB7OlsH1c/Vp8/V54B+di7RbE6qHp0kD2ry6DPzjy/DTWmFapV2o0fNiFk6TBuR/fhP1nVjxp2hZgha3sCecOrslvie5AVrvaYAezk4kXodvwuZk/WmyPWi1WDzXe9DmNOPT4SOZlePTuAEp5WNQeBRb5v/e+TOrZk7jB6T2qvgoVuDT20O9gtP4ASXnQWEnul4otTqKuTsppwkAsmiYx8IrhicCyi3j8ERAJavIiYBsVnqaWSvUxJkqoEQVp08EpDn1ru22EFBg2AACKjoEBBwCAg4BAYeAgENAwCEg4BAQcrqYZSOg+g4BAYeAgENAwCEg4JgA3e0fqB+3H/9hrSTSrZoAHceQ82wsAXXZhjKgKy/VJ9ZCMt2qCdAZGaCsBzloSwG5a1sBfXga7WIcgwIzoPuXePQppls1ATquIc9uNXdmNAYNB+j+JQFlMo5BDmdAxXSrJkBndIDu9r0pDtID9iBnERDQuAD1slShGVB4uXFw9eQfayGZbtUE6IwP0MWTv/cPXM6GthRQeB6kToWmdjVPQNjpYZEn4y52pXaxu/3PrIWy9GM/KCDUw4MN5kH6Vp0GYT6j60E9PDc7q8M8AUFnIEDTnA+K5NmtZs6c5oOUBgE01fkgpYF60HQB5RvC+SCzMwigCQ/S+Zb0uos5nCMW0q2aAJ3RAZryID1QD5oyoHRTeh2DPp3uID0EoKlO2qfqdA2jmV2LRSIg5EQPj/UFKJpOnPYuFkSI2IOqHfsqYZ2dB01wTrpgNVipaLsAWXtRS0CTvUfRZLV/Hnp+lxpFy9SJOEgXrJYPjM9vuqNsuS/44XyxOt05abNVRMQxyGA1XuxyhtMdFqvhdP7s5qTtlsOaOlsy3WG1mizmPP/DfEFe7XJbBiioXtLSGdBE71F0sqqWrXIFNNV7FB2tWhMh87oFzzFUZyJkKwHVmQhpeY9ik8bVdnoJuU6EzOwexRohx4mQbTvM647TRIgjoHzR/3iBe5Gu37g6Tn8hh4kQA6Crj76Krja0XSxf9D/Udf23IrRz+gzBiZAyoNuQjzoH0gdpbcHtwH/xekaA4ERICVB0c9CHpwfqWJadSmtLtj/8+Hu8i7Vd9H88qnzzgOkvq3Ev0s+DtEX/r09mNAalSnuRSw+KAEWdJwFUXPQ//DRDQBW3zBh2sYNkUvoi38XyMShesv1EpFs1DjrjAqR6TzQE3Xr5xGu+6H8wq8N8pjqAggt1hL9/qYahTNmi/wEB1REBAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQERENBsANkXhmsJaLDHBfqW9WkE9qBYffWgGk1o7hAQcAgIOAQEHAICDgEBh4CAQ0DAISDgEBBwCAg4g4Q8i0NAiQgIOAQEHAICDgEBh4CAQ0DI8cwOAaUiIOR4BFTtEBByjK+7IaBcBIQc0zrBBKSJgJBjoEBAuggIOV5pfVcCko4gQUDSISDkFFEQUMkhIOQUWBBQ2SEg5OgwCMjgEBByNBqOgPJF/x/OFrvnMt1l4x4z1PhiVVv0f7WM1icvpntq3OChxoDyBbfVp3K6p8YNHmoMSF+y/edkF5vPov+VcgOUL/rvHy4jXEW8Dt9EC2fkPai06H/6foSAgDJpY9C3BGSQtuj/iruYSfmi/+GnZ9mBjICACAhoZwvUCpAV3ECZAUMEBERAQN0CmqEICIiAgAgIiICAWgDyD/WX1qmLNc1YJu+0W9bKqB/PLgMp/1BdD66Ek00Hp+/xrBFKfp2D2gAqtivbWHXR7x9FF/75JK1bRv24lpkwdfTFTbD5ppjNpoPXJqbVIa2JSB0ASi5jV2+SL2UdfXPqYz4/4piJZp1elTbXP/4+3KA3x5f+i9fPvgu7oPq/06mY1e5v5h5UEcqbCNUBoFU8JbLau8n7R4wmez2ia8bWg47/XAb/hhzUvKZ65WtxCs+yi1WHDN+eUW3HoLi7qi9GfSHpl6LmkYxNQBn93dJa6vjdlw8/vQu3NX5jZzSGadPBFkCVobiJWO17ULhNCzWf//Y829jNadaaehk1LqzLI4p//Ncv//3gJ9uazNvhHlQVSpqI1QGgZMwINzR5j2bcp6P9qGZGezOwSL399STZ1nhf0aeDbYAqQmkTsboZg9SGrZ6n7U1+edqoGhlrD7pc754n23qdYM+ng62ArCF3Ph0dxdRfzMIjUvyHs/QEyDQKosx6of2BW09l/0V7Z3Qmhc6DKkLGczSzeCYNREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQED/AxmvLaoTN8WlAAAAAElFTkSuQmCC" /><!-- --></p>
 </div>
 <div id="word-couting" class="section level1">
 <h1>Word couting</h1>
@@ -828,7 +853,7 @@ datetime &lt;-<span class="st"> </span><span class="kw">do.call</span>(c, <span 
 </div>
 <div id="license" class="section level1">
 <h1>License</h1>
-<p><strong>SentimentAnalysis</strong> is released under the <a href="https://opensource.org/licenses/MIT">MIT License</a> Copyright (c) 2016 Stefan Feuerriegel &amp; Nicolas Pröllochs</p>
+<p><strong>SentimentAnalysis</strong> is released under the <a href="https://opensource.org/licenses/MIT">MIT License</a> Copyright (c) 2019 Stefan Feuerriegel &amp; Nicolas Pröllochs</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
@@ -850,6 +875,9 @@ datetime &lt;-<span class="st"> </span><span class="kw">do.call</span>(c, <span 
 </div>
 <div id="ref-DSS.2016">
 <p>———. 2016. “Negation Scope Detection in Sentiment Analysis: Decision Support for News-Driven Trading.” <em>Decision Support Systems</em>. doi:<a href="https://doi.org/10.1016/j.dss.2016.05.009">10.1016/j.dss.2016.05.009</a>.</p>
+</div>
+<div id="ref-PLOSONE.2018">
+<p>———. 2018. “Statistical Inferences for Polarity Identification in Natural Language.” <em>PLOS ONE</em> 13 (12): e209323. doi:<a href="https://doi.org/10.1371/journal.pone.0209323">10.1371/journal.pone.0209323</a>.</p>
 </div>
 <div id="ref-Ravi.2015">
 <p>Ravi, Kumar, and Vadlamani Ravi. 2015. “A Survey on Opinion Mining and Sentiment Analysis: Tasks, Approaches and Applications.” <em>Knowledge-Based Systems</em> 89: 14–46. doi:<a href="https://doi.org/10.1016/j.knosys.2015.06.015">10.1016/j.knosys.2015.06.015</a>.</p>
