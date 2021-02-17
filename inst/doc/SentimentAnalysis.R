@@ -1,13 +1,13 @@
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # install.packages("SentimentAnalysis")
 library(SentimentAnalysis)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Analyze a single string to obtain a binary response (positive / negative)
 sentiment <- analyzeSentiment("Yeah, this was a great soccer game for the German team!")
 convertToBinaryResponse(sentiment)$SentimentQDAP
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Create a vector of strings
 documents <- c("Wow, I really like the new light sabers!",
                "That book was excellent.",
@@ -33,22 +33,22 @@ compareToResponse(sentiment, convertToBinaryResponse(response))
 
 plotSentimentResponse(sentiment$SentimentQDAP, response)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 documents <- c("This is good",
                "This is bad",
                "This is inbetween")
 convertToDirection(analyzeSentiment(documents)$SentimentQDAP)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(tm)
 corpus <- VCorpus(VectorSource(documents))
 convertToDirection(analyzeSentiment(corpus)$SentimentQDAP)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 dtm <- preprocessCorpus(corpus)
 convertToDirection(analyzeSentiment(dtm)$SentimentQDAP)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Make dictionary available in the current R environment
 data(DictionarHE)
 # Display the internal structure 
@@ -61,7 +61,7 @@ summary(dict.HE)
 data(DictionaryLM)
 str(DictionaryLM)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 d <- SentimentDictionaryWordlist(c("uncertain", "possible", "likely"))
 summary(d)
 
@@ -69,7 +69,7 @@ summary(d)
 d <- SentimentDictionary(c("uncertain", "possible", "likely"))
 summary(d)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 d <- SentimentDictionaryBinary(c("increase", "rise", "more"),
                                c("fall", "drop"))
 summary(d)
@@ -79,7 +79,7 @@ d <- SentimentDictionary(c("increase", "rise", "more"),
                          c("fall", "drop"))
 summary(d)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 d <- SentimentDictionaryWeighted(c("increase", "decrease", "exit"),
                                  c(+1, -1, -10),
                                  rep(NA, 3))
@@ -91,7 +91,7 @@ d <- SentimentDictionary(c("increase", "decrease", "exit"),
                          rep(NA, 3))
 summary(d)                         
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Create a vector of strings
 documents <- c("This is a good thing!",
                "This is a very good thing!",
@@ -107,11 +107,11 @@ dict
 
 summary(dict)
 
-## ----eval=FALSE----------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  write(dict, file="dictionary.dict")
 #  dict <- read("dictionary.dict")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 compareDictionaries(dict,
                     loadDictionaryQDAP())
 
@@ -119,7 +119,7 @@ sentiment <- predict(dict, documents)
 compareToResponse(sentiment, response)
 plotSentimentResponse(sentiment, response)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 test_documents <- c("This is neither good nor bad",
                     "What a good idea!",
                     "Not bad")
@@ -132,7 +132,7 @@ plotSentimentResponse(pred, test_response)
 
 compareToResponse(analyzeSentiment(test_documents), test_response)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 corpus <- VCorpus(VectorSource(documents))
 tdm <- TermDocumentMatrix(corpus, 
                           control=list(wordLengths=c(1,Inf), 
@@ -144,12 +144,12 @@ dict <- generateDictionary(tdm, response)
 summary(dict)
 dict
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 sentiment <- analyzeSentiment(documents,
                               rules=list("SentimentLM"=list(ruleSentiment, loadDictionaryLM())))
 sentiment
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 documents <- c("Das ist ein gutes Resultat",
                "Das Ergebnis war schlecht")
 dictionaryGerman <- SentimentDictionaryBinary(c("gut"), 
@@ -162,7 +162,7 @@ sentiment
 
 convertToBinaryResponse(sentiment$GermanSentiment)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 woorden <- c("goed","slecht")
 scores <- c(0.8,-0.5)
 dictionaryDutch <- SentimentDictionaryWeighted(woorden, scores)
@@ -172,7 +172,7 @@ sentiment <- analyzeSentiment(documents,
                               rules=list("DutchSentiment"=list(ruleLinearModel, dictionaryDutch)))
 sentiment
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(tm)
 data("crude")
 
@@ -201,7 +201,7 @@ datetime <- do.call(c, lapply(crude, function(x) x$meta$datetimestamp))
 plotSentiment(sentiment$SentimentLM)
 plotSentiment(sentiment$SentimentLM, x=datetime, cumsum=TRUE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # count words (without stopwords)
 countWords(documents)
 
