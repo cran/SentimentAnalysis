@@ -13,27 +13,48 @@
 <meta name="author" content="Stefan Feuerriegel" />
 <meta name="author" content="Nicolas Proellochs" />
 
-<meta name="date" content="2021-02-18" />
+<meta name="date" content="2023-08-23" />
 
 <title>SentimentAnalysis Vignette</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -45,55 +66,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -102,13 +122,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -120,29 +147,209 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <style type="text/css">
-/* for pandoc --citeproc since 2.11 */
+
 div.csl-bib-body { }
 div.csl-entry {
-  clear: both;
+clear: both;
 }
 .hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+margin-left:2em;
+text-indent:-2em;
 }
 div.csl-left-margin {
-  min-width:2em;
-  float:left;
+min-width:2em;
+float:left;
 }
 div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
+margin-left:2em;
+padding-left:1em;
 }
 div.csl-indent {
-  margin-left: 2em;
+margin-left: 2em;
 }
 </style>
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -157,81 +364,162 @@ div.csl-indent {
 <h1 class="title toc-ignore">SentimentAnalysis Vignette</h1>
 <h4 class="author">Stefan Feuerriegel</h4>
 <h4 class="author">Nicolas Proellochs</h4>
-<h4 class="date">2021-02-18</h4>
+<h4 class="date">2023-08-23</h4>
 
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a>
 <ul>
-<li><a href="#applications-in-research">Applications in research</a></li>
-<li><a href="#applications-in-practice">Applications in practice</a></li>
+<li><a href="#applications-in-research" id="toc-applications-in-research">Applications in research</a></li>
+<li><a href="#applications-in-practice" id="toc-applications-in-practice">Applications in practice</a></li>
 </ul></li>
-<li><a href="#methods-for-sentiment-analysis">Methods for sentiment analysis</a></li>
-<li><a href="#setup-of-the-sentimentanalysis-package">Setup of the SentimentAnalysis package</a></li>
-<li><a href="#brief-demonstration">Brief demonstration</a></li>
-<li><a href="#functionality">Functionality</a>
+<li><a href="#methods-for-sentiment-analysis" id="toc-methods-for-sentiment-analysis">Methods for sentiment
+analysis</a></li>
+<li><a href="#setup-of-the-sentimentanalysis-package" id="toc-setup-of-the-sentimentanalysis-package">Setup of the
+SentimentAnalysis package</a></li>
+<li><a href="#brief-demonstration" id="toc-brief-demonstration">Brief
+demonstration</a></li>
+<li><a href="#functionality" id="toc-functionality">Functionality</a>
 <ul>
-<li><a href="#interface">Interface</a>
+<li><a href="#interface" id="toc-interface">Interface</a>
 <ul>
-<li><a href="#vector-of-strings">Vector of strings</a></li>
-<li><a href="#document-term-matrix">Document-term matrix</a></li>
-<li><a href="#corpus-object">Corpus object</a></li>
+<li><a href="#vector-of-strings" id="toc-vector-of-strings">Vector of
+strings</a></li>
+<li><a href="#document-term-matrix" id="toc-document-term-matrix">Document-term matrix</a></li>
+<li><a href="#corpus-object" id="toc-corpus-object">Corpus
+object</a></li>
 </ul></li>
-<li><a href="#built-in-dictionaries">Built-in dictionaries</a></li>
-<li><a href="#dictionary-functions">Dictionary functions</a>
+<li><a href="#built-in-dictionaries" id="toc-built-in-dictionaries">Built-in dictionaries</a></li>
+<li><a href="#dictionary-functions" id="toc-dictionary-functions">Dictionary functions</a>
 <ul>
-<li><a href="#sentimentdictionarywordlist">SentimentDictionaryWordlist</a></li>
-<li><a href="#sentimentdictionarybinary">SentimentDictionaryBinary</a></li>
-<li><a href="#sentimentdictionaryweighted">SentimentDictionaryWeighted</a></li>
+<li><a href="#sentimentdictionarywordlist" id="toc-sentimentdictionarywordlist">SentimentDictionaryWordlist</a></li>
+<li><a href="#sentimentdictionarybinary" id="toc-sentimentdictionarybinary">SentimentDictionaryBinary</a></li>
+<li><a href="#sentimentdictionaryweighted" id="toc-sentimentdictionaryweighted">SentimentDictionaryWeighted</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#dictionary-generation">Dictionary generation</a>
+<li><a href="#dictionary-generation" id="toc-dictionary-generation">Dictionary generation</a>
 <ul>
-<li><a href="#performance-evaluation">Performance evaluation</a></li>
-<li><a href="#configuration-of-preprocessing">Configuration of preprocessing</a></li>
-<li><a href="#performance-optimization">Performance optimization</a></li>
-<li><a href="#language-support-and-extensibility">Language support and extensibility</a></li>
+<li><a href="#performance-evaluation" id="toc-performance-evaluation">Performance evaluation</a></li>
+<li><a href="#configuration-of-preprocessing" id="toc-configuration-of-preprocessing">Configuration of
+preprocessing</a></li>
+<li><a href="#performance-optimization" id="toc-performance-optimization">Performance optimization</a></li>
+<li><a href="#language-support-and-extensibility" id="toc-language-support-and-extensibility">Language support and
+extensibility</a></li>
 </ul></li>
-<li><a href="#worked-examples">Worked examples</a></li>
-<li><a href="#word-couting">Word couting</a></li>
-<li><a href="#outlook">Outlook</a></li>
-<li><a href="#license">License</a></li>
-<li><a href="#references">References</a></li>
+<li><a href="#worked-examples" id="toc-worked-examples">Worked
+examples</a></li>
+<li><a href="#word-couting" id="toc-word-couting">Word couting</a></li>
+<li><a href="#outlook" id="toc-outlook">Outlook</a></li>
+<li><a href="#license" id="toc-license">License</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
 
-<p>The <code>SentimentAnalysis</code> package introduces a powerful toolchain facilitating the sentiment analysis of textual contents in R. This implementation utilizes various existing dictionaries, such as QDAP, Harvard IV and Loughran-McDonald. Furthermore, it can also create customized dictionaries. The latter function uses LASSO regularization as a statistical approach to select relevant terms based on an exogenous response variable. Finally, all methods can be easily compared using built-in evaluation routines.</p>
+<p>The <code>SentimentAnalysis</code> package introduces a powerful
+toolchain facilitating the sentiment analysis of textual contents in R.
+This implementation utilizes various existing dictionaries, such as
+QDAP, Harvard IV and Loughran-McDonald. Furthermore, it can also create
+customized dictionaries. The latter function uses LASSO regularization
+as a statistical approach to select relevant terms based on an exogenous
+response variable. Finally, all methods can be easily compared using
+built-in evaluation routines.</p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Sentiment analysis is a research branch located at the heart of natural language processing (NLP), computational linguistics and text mining. It refers to any measures by which subjective information is extracted from textual documents. In other words, it extracts the polarity of the expressed opinion in a range spanning from positive to negative. As a result, one may also refer to sentiment analysis as <em>opinion mining</em> <span class="citation">(Pang and Lee 2008)</span>.</p>
+<p>Sentiment analysis is a research branch located at the heart of
+natural language processing (NLP), computational linguistics and text
+mining. It refers to any measures by which subjective information is
+extracted from textual documents. In other words, it extracts the
+polarity of the expressed opinion in a range spanning from positive to
+negative. As a result, one may also refer to sentiment analysis as
+<em>opinion mining</em> <span class="citation">(Pang and Lee
+2008)</span>.</p>
 <div id="applications-in-research" class="section level2">
 <h2>Applications in research</h2>
-<p>Sentiment analysis has received great traction lately <span class="citation">(Ravi and Ravi 2015; Pang and Lee 2008)</span>, which we explore in the following. Current research in finance and the social sciences utilizes sentiment analysis to understand human decisions in response to textual materials. This immediately reveals manifold implications for practitioners, as well as those involved in the fields of finance research and the social sciences: researchers can use R to extract text components that are relevant for readers and test their hypotheses on this basis. By the same token, practitioners can measure which wording actually matters to their readership and enhance their writing accordingly <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2015)</span>. We demonstrate below the added benefits in two case studies drawn from finance and the social sciences.</p>
+<p>Sentiment analysis has received great traction lately <span class="citation">(Ravi and Ravi 2015; Pang and Lee 2008)</span>, which
+we explore in the following. Current research in finance and the social
+sciences utilizes sentiment analysis to understand human decisions in
+response to textual materials. This immediately reveals manifold
+implications for practitioners, as well as those involved in the fields
+of finance research and the social sciences: researchers can use R to
+extract text components that are relevant for readers and test their
+hypotheses on this basis. By the same token, practitioners can measure
+which wording actually matters to their readership and enhance their
+writing accordingly <span class="citation">(Pröllochs, Feuerriegel, and
+Neumann 2015)</span>. We demonstrate below the added benefits in two
+case studies drawn from finance and the social sciences.</p>
 </div>
 <div id="applications-in-practice" class="section level2">
 <h2>Applications in practice</h2>
-<p>Several applications demonstrate the uses of sentiment analysis for organizations and enterprises:</p>
+<p>Several applications demonstrate the uses of sentiment analysis for
+organizations and enterprises:</p>
 <ul>
-<li><p><strong>Finance:</strong> Investors in financial markets refer to textual information in the form of financial news disclosures before exercising ownership in stocks. Interestingly, they rely not only on quantitative numbers, but also soft information, such as tone and sentiment <span class="citation">(Henry 2008; Loughran and McDonald 2011; Tetlock 2007)</span>, which thereby strongly influences stock prices. By utilizing sentiment analysis, automated traders can automatically analyze the sentiment conveyed in financial disclosures in order to trigger investment decisions within milliseconds.</p></li>
-<li><p><strong>Marketing:</strong> Marketing departments are often interested in tracking brand image. For that purpose, they collect large volumes of user opinions from social media and evaluate the feelings of individuals towards brands, products and services. Practitioners in the field of marketing can exploit these insights to enhance their wording according to the feedback of their readership.</p></li>
-<li><p><strong>Rating and review platforms:</strong> Rating and review platforms fulfill a valuable function by collecting user ratings or preferences for certain products and services. Here, one can automatically process large volumes of user-generated content and exploit the knowledge gained thereby. For example, one can identify which cues convey a positive or negative opinion, or even automatically validate their credibility.</p></li>
+<li><p><strong>Finance:</strong> Investors in financial markets refer to
+textual information in the form of financial news disclosures before
+exercising ownership in stocks. Interestingly, they rely not only on
+quantitative numbers, but also soft information, such as tone and
+sentiment <span class="citation">(Henry 2008; Loughran and McDonald
+2011; Tetlock 2007)</span>, which thereby strongly influences stock
+prices. By utilizing sentiment analysis, automated traders can
+automatically analyze the sentiment conveyed in financial disclosures in
+order to trigger investment decisions within milliseconds.</p></li>
+<li><p><strong>Marketing:</strong> Marketing departments are often
+interested in tracking brand image. For that purpose, they collect large
+volumes of user opinions from social media and evaluate the feelings of
+individuals towards brands, products and services. Practitioners in the
+field of marketing can exploit these insights to enhance their wording
+according to the feedback of their readership.</p></li>
+<li><p><strong>Rating and review platforms:</strong> Rating and review
+platforms fulfill a valuable function by collecting user ratings or
+preferences for certain products and services. Here, one can
+automatically process large volumes of user-generated content and
+exploit the knowledge gained thereby. For example, one can identify
+which cues convey a positive or negative opinion, or even automatically
+validate their credibility.</p></li>
 </ul>
 </div>
 </div>
 <div id="methods-for-sentiment-analysis" class="section level1">
 <h1>Methods for sentiment analysis</h1>
-<p>As sentiment analysis is applied to a broad variety of domains and textual sources, research has devised various approaches to measuring sentiment. A recent literature overview <span class="citation">(Pang and Lee 2008)</span> provides a comprehensive, domain-independent survey.</p>
-<p>On the one hand, machine learning approaches are preferred when one strives for high prediction performance. However, machine learning usually works as a black-box, thereby making interpretations diffucult. On the other hand, dictionary-based approaches generate lists of positive and negative words. The respective occurrences of these words are then combined into a single sentiment score. Therefore, the underlying decisions become traceable and researchers can understand the factors that result in a specific sentiment.</p>
-<p>In addition, <code>SentimentAnalysis</code> allows one to generate tailored dictionaries. These are customized to a specific domain, improve prediction performance compared to pure dictionaries and allow full interpretability. Details of this methodology can be found in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2018)</span>.</p>
-<p>In the process of performing sentiment analysis, one must convert the running text into a machine-readable format. This is achieved by executing a series of preprocessing operations. First, the text is tokenized into single words, followed by what are common preprocessing steps: stopword removal, stemming, removal of punctuation and conversion to lower-case. These operations are also conducted by default in <code>SentimentAnalysis</code>, but can be adapted to one’s personal needs.</p>
+<p>As sentiment analysis is applied to a broad variety of domains and
+textual sources, research has devised various approaches to measuring
+sentiment. A recent literature overview <span class="citation">(Pang and
+Lee 2008)</span> provides a comprehensive, domain-independent
+survey.</p>
+<p>On the one hand, machine learning approaches are preferred when one
+strives for high prediction performance. However, machine learning
+usually works as a black-box, thereby making interpretations diffucult.
+On the other hand, dictionary-based approaches generate lists of
+positive and negative words. The respective occurrences of these words
+are then combined into a single sentiment score. Therefore, the
+underlying decisions become traceable and researchers can understand the
+factors that result in a specific sentiment.</p>
+<p>In addition, <code>SentimentAnalysis</code> allows one to generate
+tailored dictionaries. These are customized to a specific domain,
+improve prediction performance compared to pure dictionaries and allow
+full interpretability. Details of this methodology can be found in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2018)</span>.</p>
+<p>In the process of performing sentiment analysis, one must convert the
+running text into a machine-readable format. This is achieved by
+executing a series of preprocessing operations. First, the text is
+tokenized into single words, followed by what are common preprocessing
+steps: stopword removal, stemming, removal of punctuation and conversion
+to lower-case. These operations are also conducted by default in
+<code>SentimentAnalysis</code>, but can be adapted to one’s personal
+needs.</p>
 </div>
 <div id="setup-of-the-sentimentanalysis-package" class="section level1">
 <h1>Setup of the SentimentAnalysis package</h1>
-<p>Even though sentiment analysis has received great traction lately, the available tools are not yet living up to the needs of researchers. The <code>SentimentAnalysis</code> package is intended to partially close this gap and offer capabilities that most research demands.</p>
-<p>First, simply install the package <code>SentimentAnalysis</code> from CRAN. Afterwards, one merely needs to load the <code>SentimentAnalysis</code> package as follows. This section shows the basic functionality to crawl for ad hoc filings. The following lines extract the ad hoc disclosure that was published most recently.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;SentimentAnalysis&quot;)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SentimentAnalysis)</span></code></pre></div>
+<p>Even though sentiment analysis has received great traction lately,
+the available tools are not yet living up to the needs of researchers.
+The <code>SentimentAnalysis</code> package is intended to partially
+close this gap and offer capabilities that most research demands.</p>
+<p>First, simply install the package <code>SentimentAnalysis</code> from
+CRAN. Afterwards, one merely needs to load the
+<code>SentimentAnalysis</code> package as follows. This section shows
+the basic functionality to crawl for ad hoc filings. The following lines
+extract the ad hoc disclosure that was published most recently.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># install.packages(&quot;SentimentAnalysis&quot;)</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(SentimentAnalysis)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;SentimentAnalysis&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:base&#39;:
@@ -240,32 +528,32 @@ div.csl-indent {
 </div>
 <div id="brief-demonstration" class="section level1">
 <h1>Brief demonstration</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze a single string to obtain a binary response (positive / negative)</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(<span class="st">&quot;Yeah, this was a great soccer game for the German team!&quot;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToBinaryResponse</span>(sentiment)<span class="sc">$</span>SentimentQDAP</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Analyze a single string to obtain a binary response (positive / negative)</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(<span class="st">&quot;Yeah, this was a great soccer game for the German team!&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">convertToBinaryResponse</span>(sentiment)<span class="sc">$</span>SentimentQDAP</span></code></pre></div>
 <pre><code>## [1] positive
 ## Levels: negative positive</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of strings</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Wow, I really like the new light sabers!&quot;</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;That book was excellent.&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;R is a fantastic language.&quot;</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;The service in this restaurant was miserable.&quot;</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is neither positive or negative.&quot;</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;The waiter forget about my dessert -- what poor service!&quot;</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze sentiment</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract dictionary-based sentiment according to the QDAP dictionary</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>sentiment<span class="sc">$</span>SentimentQDAP</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Create a vector of strings</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Wow, I really like the new light sabers!&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>               <span class="st">&quot;That book was excellent.&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>               <span class="st">&quot;R is a fantastic language.&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>               <span class="st">&quot;The service in this restaurant was miserable.&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>               <span class="st">&quot;This is neither positive or negative.&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>               <span class="st">&quot;The waiter forget about my dessert -- what poor service!&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co"># Analyze sentiment</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co"># Extract dictionary-based sentiment according to the QDAP dictionary</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>sentiment<span class="sc">$</span>SentimentQDAP</span></code></pre></div>
 <pre><code>## [1]  0.3333333  0.5000000  0.5000000 -0.3333333  0.0000000 -0.4000000</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View sentiment direction (i.e. positive, neutral and negative)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToDirection</span>(sentiment<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># View sentiment direction (i.e. positive, neutral and negative)</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">convertToDirection</span>(sentiment<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
 <pre><code>## [1] positive positive positive negative neutral  negative
 ## Levels: negative neutral positive</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">+</span><span class="dv">1</span>, <span class="sc">+</span><span class="dv">1</span>, <span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">compareToResponse</span>(sentiment, response)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">+</span><span class="dv">1</span>, <span class="sc">+</span><span class="dv">1</span>, <span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="fu">compareToResponse</span>(sentiment, response)</span></code></pre></div>
 <pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
 <pre><code>## Warning in cor(x, y): the standard deviation is zero
 
@@ -335,7 +623,7 @@ div.csl-indent {
 ## BalancedAccuracy            1.0000000000    0.500000000    0.500000000
 ## avg.sentiment.pos.response  0.3333333333    0.083333333    0.416666667
 ## avg.sentiment.neg.response -0.3666666667    0.366666667    0.000000000</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compareToResponse</span>(sentiment, <span class="fu">convertToBinaryResponse</span>(response))</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">compareToResponse</span>(sentiment, <span class="fu">convertToBinaryResponse</span>(response))</span></code></pre></div>
 <pre><code>##                            WordCount SentimentGI NegativityGI PositivityGI
 ## Accuracy                   0.6666667   1.0000000   0.66666667    0.6666667
 ## Precision                        NaN   1.0000000          NaN          NaN
@@ -372,80 +660,107 @@ div.csl-indent {
 ## BalancedAccuracy               1.0000000     0.50000000      0.5000000
 ## avg.sentiment.pos.response     0.3333333     0.08333333      0.4166667
 ## avg.sentiment.neg.response    -0.3666667     0.36666667      0.0000000</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSentimentResponse</span>(sentiment<span class="sc">$</span>SentimentQDAP, response)</span></code></pre></div>
-<pre><code>## `geom_smooth()` using formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
-<pre><code>## Warning: Computation failed in `stat_smooth()`:
-## x has insufficient unique values to support 10 knots: reduce k.</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">plotSentimentResponse</span>(sentiment<span class="sc">$</span>SentimentQDAP, response)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre><code>## Warning: Computation failed in `stat_smooth()`
+## Caused by error in `smooth.construct.cr.smooth.spec()`:
+## ! x has insufficient unique values to support 10 knots: reduce k.</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>The <code>SentimentAnalysis</code> package works very cleverly and neatly here in order to remove the effort for the user: it recognizes that the user has inserted a vector of strings and thus automatically performs a set of default preprocessing operations from text mining. Hence, it tokenizes each document and finally converts the input into a document-term matrix. All of the previous operations are undertaken without manual specification. The <code>analyzeSentiment()</code> routine also accepts other input formats in case the user has already performed a preprocessing step or wants to implement a specific set of operations.</p>
+<p>The <code>SentimentAnalysis</code> package works very cleverly and
+neatly here in order to remove the effort for the user: it recognizes
+that the user has inserted a vector of strings and thus automatically
+performs a set of default preprocessing operations from text mining.
+Hence, it tokenizes each document and finally converts the input into a
+document-term matrix. All of the previous operations are undertaken
+without manual specification. The <code>analyzeSentiment()</code>
+routine also accepts other input formats in case the user has already
+performed a preprocessing step or wants to implement a specific set of
+operations.</p>
 </div>
 <div id="functionality" class="section level1">
 <h1>Functionality</h1>
-<p>The following sections present the functionality in terms of working with different input formats and the underlying dictionaries.</p>
+<p>The following sections present the functionality in terms of working
+with different input formats and the underlying dictionaries.</p>
 <div id="interface" class="section level2">
 <h2>Interface</h2>
-<p>The <code>SentimentAnalysis</code> package provides interfaces with several other input formats, among which are</p>
+<p>The <code>SentimentAnalysis</code> package provides interfaces with
+several other input formats, among which are</p>
 <ul>
 <li><p>Vector of strings.</p></li>
-<li><p>DocumentTermMatrix and TermDocumentMatrix as implemented in the <code>tm</code> package <span class="citation">(Feinerer, Hornik, and Meyer 2008)</span>.</p></li>
+<li><p>DocumentTermMatrix and TermDocumentMatrix as implemented in the
+<code>tm</code> package <span class="citation">(Feinerer, Hornik, and
+Meyer 2008)</span>.</p></li>
 <li><p>Corpus object as implemented by the <code>tm</code> package <span class="citation">(Feinerer, Hornik, and Meyer 2008)</span>.</p></li>
 </ul>
 <p>We provide examples in the following.</p>
 <div id="vector-of-strings" class="section level3">
 <h3>Vector of strings</h3>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;This is good&quot;</span>,</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is bad&quot;</span>,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is inbetween&quot;</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToDirection</span>(<span class="fu">analyzeSentiment</span>(documents)<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;This is good&quot;</span>,</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>               <span class="st">&quot;This is bad&quot;</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>               <span class="st">&quot;This is inbetween&quot;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="fu">convertToDirection</span>(<span class="fu">analyzeSentiment</span>(documents)<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
 <pre><code>## [1] positive negative neutral 
 ## Levels: negative neutral positive</code></pre>
 </div>
 <div id="document-term-matrix" class="section level3">
 <h3>Document-term matrix</h3>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tm)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">library</span>(tm)</span></code></pre></div>
+<pre><code>## Warning: package &#39;tm&#39; was built under R version 4.3.1</code></pre>
 <pre><code>## Loading required package: NLP</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">VCorpus</span>(<span class="fu">VectorSource</span>(documents))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToDirection</span>(<span class="fu">analyzeSentiment</span>(corpus)<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">VCorpus</span>(<span class="fu">VectorSource</span>(documents))</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">convertToDirection</span>(<span class="fu">analyzeSentiment</span>(corpus)<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
 <pre><code>## [1] positive negative neutral 
 ## Levels: negative neutral positive</code></pre>
 </div>
 <div id="corpus-object" class="section level3">
 <h3>Corpus object</h3>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> <span class="fu">preprocessCorpus</span>(corpus)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToDirection</span>(<span class="fu">analyzeSentiment</span>(dtm)<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> <span class="fu">preprocessCorpus</span>(corpus)</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="fu">convertToDirection</span>(<span class="fu">analyzeSentiment</span>(dtm)<span class="sc">$</span>SentimentQDAP)</span></code></pre></div>
 <pre><code>## [1] positive negative neutral 
 ## Levels: negative neutral positive</code></pre>
-<p>Since the package can work directly with a document-term matrix, this allows one to use customized preprocessing operations in the first place. Afterwards, one can utilize the <code>SentimentAnalysis</code> package for the computation of sentiment scores. For instance, one can replace the stopwords with those from a different list, or even perform tailored synonym merging, among other options. By default, the package uses the built-in routines <code>transformIntoCorpus()</code> to convert the input into a <code>Corpus</code> object and <code>preprocessCorpus()</code> to convert it into a <code>DocumentTermMatrix</code>.</p>
+<p>Since the package can work directly with a document-term matrix, this
+allows one to use customized preprocessing operations in the first
+place. Afterwards, one can utilize the <code>SentimentAnalysis</code>
+package for the computation of sentiment scores. For instance, one can
+replace the stopwords with those from a different list, or even perform
+tailored synonym merging, among other options. By default, the package
+uses the built-in routines <code>transformIntoCorpus()</code> to convert
+the input into a <code>Corpus</code> object and
+<code>preprocessCorpus()</code> to convert it into a
+<code>DocumentTermMatrix</code>.</p>
 </div>
 </div>
 <div id="built-in-dictionaries" class="section level2">
 <h2>Built-in dictionaries</h2>
-<p>The <code>SentimentAnalysis</code> package entails three different dictionaries:</p>
+<p>The <code>SentimentAnalysis</code> package entails three different
+dictionaries:</p>
 <ul>
 <li><p>Harvard-IV dictionary</p></li>
-<li><p>Henry’s Financial dictionary <span class="citation">(Henry 2008)</span></p></li>
+<li><p>Henry’s Financial dictionary <span class="citation">(Henry
+2008)</span></p></li>
 <li><p>Loughran-McDonald Financial dictionary <span class="citation">(Loughran and McDonald 2011)</span></p></li>
 <li><p>QDAP dictionary from the package <a href="https://cran.r-project.org/package=qdapDictionaries"><code>qdapDictionaries</code></a></p></li>
 </ul>
-<p>All of them can be manually inspected and even accessed as follows:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Make dictionary available in the current R environment</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(DictionarHE)</span></code></pre></div>
+<p>All of them can be manually inspected and even accessed as
+follows:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Make dictionary available in the current R environment</span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="fu">data</span>(DictionarHE)</span></code></pre></div>
 <pre><code>## Warning in data(DictionarHE): data set &#39;DictionarHE&#39; not found</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the internal structure </span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(DictionaryHE)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Display the internal structure </span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="fu">str</span>(DictionaryHE)</span></code></pre></div>
 <pre><code>## List of 2
 ##  $ negative: chr [1:85] &quot;below&quot; &quot;challenge&quot; &quot;challenged&quot; &quot;challenges&quot; ...
 ##  $ positive: chr [1:105] &quot;above&quot; &quot;accomplish&quot; &quot;accomplished&quot; &quot;accomplishes&quot; ...</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Access dictionary as an object of type SentimentDictionary</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>dict.HE <span class="ot">&lt;-</span> <span class="fu">loadDictionaryHE</span>()</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Print summary statistics of dictionary</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dict.HE)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="co"># Access dictionary as an object of type SentimentDictionary</span></span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>dict.HE <span class="ot">&lt;-</span> <span class="fu">loadDictionaryHE</span>()</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a><span class="co"># Print summary statistics of dictionary</span></span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a><span class="fu">summary</span>(dict.HE)</span></code></pre></div>
 <pre><code>## Dictionary type:  binary (positive / negative)
 ## Total entries:    97
 ## Positive entries: 53 (54.64%)
 ## Negative entries: 44 (45.36%)</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(DictionaryLM)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(DictionaryLM)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">data</span>(DictionaryLM)</span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="fu">str</span>(DictionaryLM)</span></code></pre></div>
 <pre><code>## List of 3
 ##  $ negative   : chr [1:2355] &quot;abandon&quot; &quot;abandoned&quot; &quot;abandoning&quot; &quot;abandonment&quot; ...
 ##  $ positive   : chr [1:354] &quot;able&quot; &quot;abundance&quot; &quot;abundant&quot; &quot;acclaimed&quot; ...
@@ -453,37 +768,54 @@ div.csl-indent {
 </div>
 <div id="dictionary-functions" class="section level2">
 <h2>Dictionary functions</h2>
-<p>The <code>SentimentAnalysis</code> package distinguishes between three different types of dictionaries. All of them differ by the data they store, which ultimately also controls which methods of sentiment analysis one can apply. The dictionaries are as follows:</p>
+<p>The <code>SentimentAnalysis</code> package distinguishes between
+three different types of dictionaries. All of them differ by the data
+they store, which ultimately also controls which methods of sentiment
+analysis one can apply. The dictionaries are as follows:</p>
 <ul>
-<li><p><code>SentimentDictionaryWordlist</code> contains a list of words belonging to a single category. For instance, it can bundle a list of uncertainty words in order to compute the ratio of uncertainty words in that particular document.</p></li>
-<li><p><code>SentimentDictionaryBinary</code> stores two lists of words, one for positive and one for negative entries. This allows one to later compute the polarity of the document on a scale from very positive to very negative. However, the categories are not further distinguished or rated, i.e. all positive words are assigned the same degree of positivity.</p></li>
-<li><p><code>SentimentDictionaryWeighted</code> allows words to take on continuous sentiment scores. This allows one, for instance, to rate <em>increase</em> as being more positive than <em>improve</em>. These weights can then be transformed into a linear model. For this purpose, the <strong>SentimentDictionaryWeighted</strong> also entails an intercept. It can also store an additional factor in order to revert the weighting by an inverse document frequency.</p></li>
+<li><p><code>SentimentDictionaryWordlist</code> contains a list of words
+belonging to a single category. For instance, it can bundle a list of
+uncertainty words in order to compute the ratio of uncertainty words in
+that particular document.</p></li>
+<li><p><code>SentimentDictionaryBinary</code> stores two lists of words,
+one for positive and one for negative entries. This allows one to later
+compute the polarity of the document on a scale from very positive to
+very negative. However, the categories are not further distinguished or
+rated, i.e. all positive words are assigned the same degree of
+positivity.</p></li>
+<li><p><code>SentimentDictionaryWeighted</code> allows words to take on
+continuous sentiment scores. This allows one, for instance, to rate
+<em>increase</em> as being more positive than <em>improve</em>. These
+weights can then be transformed into a linear model. For this purpose,
+the <strong>SentimentDictionaryWeighted</strong> also entails an
+intercept. It can also store an additional factor in order to revert the
+weighting by an inverse document frequency.</p></li>
 </ul>
 <div id="sentimentdictionarywordlist" class="section level3">
 <h3>SentimentDictionaryWordlist</h3>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryWordlist</span>(<span class="fu">c</span>(<span class="st">&quot;uncertain&quot;</span>, <span class="st">&quot;possible&quot;</span>, <span class="st">&quot;likely&quot;</span>))</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryWordlist</span>(<span class="fu">c</span>(<span class="st">&quot;uncertain&quot;</span>, <span class="st">&quot;possible&quot;</span>, <span class="st">&quot;likely&quot;</span>))</span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
 <pre><code>## Dictionary type:  word list (single set)
 ## Total entries:    3</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative call</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionary</span>(<span class="fu">c</span>(<span class="st">&quot;uncertain&quot;</span>, <span class="st">&quot;possible&quot;</span>, <span class="st">&quot;likely&quot;</span>))</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="co"># Alternative call</span></span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionary</span>(<span class="fu">c</span>(<span class="st">&quot;uncertain&quot;</span>, <span class="st">&quot;possible&quot;</span>, <span class="st">&quot;likely&quot;</span>))</span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
 <pre><code>## Dictionary type:  word list (single set)
 ## Total entries:    3</code></pre>
 </div>
 <div id="sentimentdictionarybinary" class="section level3">
 <h3>SentimentDictionaryBinary</h3>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryBinary</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;rise&quot;</span>, <span class="st">&quot;more&quot;</span>),</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;fall&quot;</span>, <span class="st">&quot;drop&quot;</span>))</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryBinary</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;rise&quot;</span>, <span class="st">&quot;more&quot;</span>),</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;fall&quot;</span>, <span class="st">&quot;drop&quot;</span>))</span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
 <pre><code>## Dictionary type:  binary (positive / negative)
 ## Total entries:    5
 ## Positive entries: 3 (60%)
 ## Negative entries: 2 (40%)</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative call</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionary</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;rise&quot;</span>, <span class="st">&quot;more&quot;</span>),</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">c</span>(<span class="st">&quot;fall&quot;</span>, <span class="st">&quot;drop&quot;</span>))</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="co"># Alternative call</span></span>
+<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionary</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;rise&quot;</span>, <span class="st">&quot;more&quot;</span>),</span>
+<span id="cb43-3"><a href="#cb43-3" tabindex="-1"></a>                         <span class="fu">c</span>(<span class="st">&quot;fall&quot;</span>, <span class="st">&quot;drop&quot;</span>))</span>
+<span id="cb43-4"><a href="#cb43-4" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
 <pre><code>## Dictionary type:  binary (positive / negative)
 ## Total entries:    5
 ## Positive entries: 3 (60%)
@@ -491,10 +823,10 @@ div.csl-indent {
 </div>
 <div id="sentimentdictionaryweighted" class="section level3">
 <h3>SentimentDictionaryWeighted</h3>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryWeighted</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">c</span>(<span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">10</span>),</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">3</span>))</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryWeighted</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>                                 <span class="fu">c</span>(<span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">10</span>),</span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>                                 <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">3</span>))</span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a><span class="fu">summary</span>(d)</span></code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
 ## Total entries:    3
 ## Positive entries: 1 (33.33%)
@@ -508,11 +840,11 @@ div.csl-indent {
 ## Max:                1
 ## Standard deviation: 5.859465
 ## Skewness:           -0.6155602</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative call</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionary</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">c</span>(<span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">10</span>),</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">3</span>))</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d)                         </span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="co"># Alternative call</span></span>
+<span id="cb47-2"><a href="#cb47-2" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">SentimentDictionary</span>(<span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>, <span class="st">&quot;exit&quot;</span>),</span>
+<span id="cb47-3"><a href="#cb47-3" tabindex="-1"></a>                         <span class="fu">c</span>(<span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">10</span>),</span>
+<span id="cb47-4"><a href="#cb47-4" tabindex="-1"></a>                         <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">3</span>))</span>
+<span id="cb47-5"><a href="#cb47-5" tabindex="-1"></a><span class="fu">summary</span>(d)                         </span></code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
 ## Total entries:    3
 ## Positive entries: 1 (33.33%)
@@ -531,24 +863,35 @@ div.csl-indent {
 </div>
 <div id="dictionary-generation" class="section level1">
 <h1>Dictionary generation</h1>
-<p>The following example shows how the <code>SentimentAnalysis</code> package can extract statistically relevant textual drivers based on an exogenous response variable. The details of this method are presented in <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2018)</span>, while we provide a brief summary here. Let  denote a response variable in the form of a vector. Furthermore, variables  give the number of occurrences of word  in a document. The methodology then estimates a linear model  with intercept  and coefficients . The estimation routine is based on LASSO regularization, which implicitly performs variable selection. In so doing, it sets some of the coefficients  to exactly zero. The remaining words can then be ranked by polarity according to their coefficient.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of strings</span></span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;This is a good thing!&quot;</span>,</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is a very good thing!&quot;</span>,</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is okay.&quot;</span>,</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is a bad thing.&quot;</span>,</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;This is a very bad thing.&quot;</span>)</span>
-<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate dictionary with LASSO regularization</span></span>
-<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">generateDictionary</span>(documents, response)</span>
-<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>dict</span></code></pre></div>
+<p>The following example shows how the <code>SentimentAnalysis</code>
+package can extract statistically relevant textual drivers based on an
+exogenous response variable. The details of this method are presented in
+<span class="citation">(Pröllochs, Feuerriegel, and Neumann
+2018)</span>, while we provide a brief summary here. Let denote a
+response variable in the form of a vector. Furthermore, variables give
+the number of occurrences of word in a document. The methodology then
+estimates a linear model with intercept and coefficients . The
+estimation routine is based on LASSO regularization, which implicitly
+performs variable selection. In so doing, it sets some of the
+coefficients to exactly zero. The remaining words can then be ranked by
+polarity according to their coefficient.</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="co"># Create a vector of strings</span></span>
+<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;This is a good thing!&quot;</span>,</span>
+<span id="cb49-3"><a href="#cb49-3" tabindex="-1"></a>               <span class="st">&quot;This is a very good thing!&quot;</span>,</span>
+<span id="cb49-4"><a href="#cb49-4" tabindex="-1"></a>               <span class="st">&quot;This is okay.&quot;</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" tabindex="-1"></a>               <span class="st">&quot;This is a bad thing.&quot;</span>,</span>
+<span id="cb49-6"><a href="#cb49-6" tabindex="-1"></a>               <span class="st">&quot;This is a very bad thing.&quot;</span>)</span>
+<span id="cb49-7"><a href="#cb49-7" tabindex="-1"></a>response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb49-8"><a href="#cb49-8" tabindex="-1"></a></span>
+<span id="cb49-9"><a href="#cb49-9" tabindex="-1"></a><span class="co"># Generate dictionary with LASSO regularization</span></span>
+<span id="cb49-10"><a href="#cb49-10" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">generateDictionary</span>(documents, response)</span>
+<span id="cb49-11"><a href="#cb49-11" tabindex="-1"></a></span>
+<span id="cb49-12"><a href="#cb49-12" tabindex="-1"></a>dict</span></code></pre></div>
 <pre><code>## Type: weighted (words with individual scores)
 ## Intercept: 5.55333e-05
 ## -0.51 bad
 ##  0.51 good</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dict)</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="fu">summary</span>(dict)</span></code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
 ## Total entries:    2
 ## Positive entries: 1 (50%)
@@ -562,15 +905,29 @@ div.csl-indent {
 ## Max:                0.5118801
 ## Standard deviation: 0.7239821
 ## Skewness:           0</code></pre>
-<p>In practice, users have several options for fine-tuning. Among these, they can disable the intercept  and fix it to zero, or standardize the response variable . In addition, it is possible to replace the LASSO with any variant of the elastic net, simply by changing the argument <code>alpha</code>.</p>
-<p>Finally, one can save and reload dictionaries using <code>read()</code> and <code>write()</code> as follows:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write</span>(dict, <span class="at">file=</span><span class="st">&quot;dictionary.dict&quot;</span>)</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">read</span>(<span class="st">&quot;dictionary.dict&quot;</span>)</span></code></pre></div>
+<p>In practice, users have several options for fine-tuning. Among these,
+they can disable the intercept and fix it to zero, or standardize the
+response variable . In addition, it is possible to replace the LASSO
+with any variant of the elastic net, simply by changing the argument
+<code>alpha</code>.</p>
+<p>Finally, one can save and reload dictionaries using
+<code>read()</code> and <code>write()</code> as follows:</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="fu">write</span>(dict, <span class="at">file=</span><span class="st">&quot;dictionary.dict&quot;</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">read</span>(<span class="st">&quot;dictionary.dict&quot;</span>)</span></code></pre></div>
 <div id="performance-evaluation" class="section level2">
 <h2>Performance evaluation</h2>
-<p>Ultimately, several routines allow one to exlore the generated dictionary further. On the one hand, a simple overview can be displayed by means of the <code>summary()</code> routine. On the other hand, a Kernel Density Estimation can also visualize the distribution of positive and negative words. For instance, one can identify whether the opinionated words were skewed to either end of the polarity scale. Lastly, the <code>compareDictionary()</code> routine can compare the generated dictionary to dictionaries from the literature. It automatically computes various metrics, among which are the overlap or the correlation.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compareDictionaries</span>(dict,</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">loadDictionaryQDAP</span>())</span></code></pre></div>
+<p>Ultimately, several routines allow one to exlore the generated
+dictionary further. On the one hand, a simple overview can be displayed
+by means of the <code>summary()</code> routine. On the other hand, a
+Kernel Density Estimation can also visualize the distribution of
+positive and negative words. For instance, one can identify whether the
+opinionated words were skewed to either end of the polarity scale.
+Lastly, the <code>compareDictionary()</code> routine can compare the
+generated dictionary to dictionaries from the literature. It
+automatically computes various metrics, among which are the overlap or
+the correlation.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">compareDictionaries</span>(dict,</span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a>                    <span class="fu">loadDictionaryQDAP</span>())</span></code></pre></div>
 <pre><code>## Comparing: wordlist vs weighted
 ## 
 ## Total unique words: 4213
@@ -601,8 +958,8 @@ div.csl-indent {
 ## 
 ## $correlation
 ## [1] 1</code></pre>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">predict</span>(dict, documents)</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">compareToResponse</span>(sentiment, response)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">predict</span>(dict, documents)</span>
+<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a><span class="fu">compareToResponse</span>(sentiment, response)</span></code></pre></div>
 <pre><code>##                             Dictionary
 ## cor                         0.94868330
 ## cor.t.statistic             5.19615237
@@ -619,20 +976,24 @@ div.csl-indent {
 ## BalancedAccuracy            1.00000000
 ## avg.sentiment.pos.response  0.45116801
 ## avg.sentiment.neg.response -0.67675202</code></pre>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSentimentResponse</span>(sentiment, response)</span></code></pre></div>
-<pre><code>## `geom_smooth()` using formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
-<pre><code>## Warning: Computation failed in `stat_smooth()`:
-## x has insufficient unique values to support 10 knots: reduce k.</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a><span class="fu">plotSentimentResponse</span>(sentiment, response)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre><code>## Warning: Computation failed in `stat_smooth()`
+## Caused by error in `smooth.construct.cr.smooth.spec()`:
+## ! x has insufficient unique values to support 10 knots: reduce k.</code></pre>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAArlBMVEUAAAAAADoAAGYAOpAAZrYzMzM6AAA6ADo6kNtNTU1NTW5NTY5NbqtNjshmAABmtv9uTW5uTY5ubo5ubqtuq+SOTU2OTW6OTY6Obk2OyP+QOgCQtpCQ2/+rbk2rbm6rbo6ryKur5OSr5P+2ZgC2kDq22/+2///Ijk3I///bkDrbkJDb/7bb///kq27k///r6+v/tmb/yI7/25D/27b/5Kv//7b//8j//9v//+T///9B0r9pAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAG+ElEQVR4nO2dC1vbNhhGDaE0YS3ZhV3IaNeRDZoNWmBA0P//Y7McJ7ITxa+V1I6Iz3m2FvJaj+1TWXbsfFFioJJk1xsQOwgSIEiAIAGCBAgSbCboTQfYTpD31a/Vjarj2BojSKQIEimCRIogkSJIpAgSaW1Bjz98zv5+/nnw7sty65Dt2FNB94PvMkEvH87N7fvl1iHb8RoEJcnCR01B1yefZj3o+dfPi860t4KSxBkKPcQef/pinn+5NPnbjK97SSYo/zlU0P27uaCi3nX/FBvEMTT+Nj2o2LqRzdxh4/AxaCGoE2NQkVBBLx/OOnAWKxAkyP7PdVAICBIgSIAgAYIECBIgSIAgAYIECBIgSIAgAYIECBIgSIAgAYIECBIgSIAgAYIEe/pktQg9SKQIEimCRIogkSJIpAgSKYJEiiCRIkikCBIpgkSKIJEiSKQIEimCRIogkSJIpAgSKYJEiiCRIkikCBIpgkRaU5ArYbkdDPLyVYOgBYVS3utzT+uQ7XgNgoIL6lwZ3cvHy8LreyoovCTTFWKmx9pgcJ61pKjX4Up5H7+/LPQielBOuZTXjUN7KmibMShj7wUVqHsWm5fy2oPt5Q9O88vMroNsJ0qvg04WxxqCBAgSIEiAIAGCBAgSIEiAIAGCBAgSIEiAIAGCBAgSIEiAIEFnBU2SZDjp3VSvznRX0Lj37+lwOjqqXp3prKCn02H6n7k7vKpeH4IQtOYQm9hD7Om0X706011B5s4+WtR+qHqWgryvxtYJtmqMIJF6BWWjdKLH6M4KGh+ZyeHVhOsgs/Y0b68SOc1b1l4H9RGU4RM0HfXvDi7sgaboqCDzcJwcpW/IeLNqOM3LFEEiXXeIWRikzbpBWg/P5dYh27EHguy9jnp0VNB0hKAF3jGoxiViuXXIduyBoPSNKoP0HE7zIkWQSNc+F6t3y3WD7dgHQRM7+nDTPqPiOojbHRYEiZRDTKQ1B2lX9cwUfj5c1fOOpzIulAK2tObQisPdTiNaLCZtac0Vh1jhHaurWd3tVMbFcuSWqDdIu6rn3U5lHEkPWj3N+3pQsXXjmzknjjFoVVAsY1AsZzH7VKx0iLmqZ6YyNu5+UOGWkKt65jooBAQJuiqIzwc5+HyQSPl8kEj5fJBI+XyQSPl8kEg5zYsUQSKlXkyk1IuJlHIokSJIpNSLiXTLerENtmMvBNWl44L+YQzyChoniT3BP50ySBufoMnhVfpu1Q5Dw+rVmW4KsnLMXe+vpMaFdCcFZQ/F0rfzNc5h3ax6zgXV8tPhHvT2onpVS61DtgNB0e3jVo0RJFKPoJXnzuvpoqAgECRAkABBAgQJECRAkABBAgQJECRAkABBAgQJECRAkABBAgQJECRA0Bzmet5yrudSJWBs+7hV49CqZ/9cz+Va0tj2cavG9QSpuZ53UI3cFvUEqbmeO92DrgeD93KuZ8Yg5nqubMtcz8z1zJX0ho0RJFIEiRRBIkWQSBEkUgSJFEEiRZBIESRSBIkUQSJFkEgRJFIEiRRBIkWQSBEkUgSJFEEi3VLQrp97Ng89SKQIEimCRIogkSJIpAgSKYJEiiCRIkikCBIpgkSKIJEiSKQIEimCRIogkSJIpAgSKYJEiiCRIkikCBIpgkRaW9C8Goop/Pzc56XOa6Yy7npBnbk++TTrQf5pRDtdkpmTW/FPZdz5ol4nyD+Vcad7kC3qNZ4eVGzNGLQQxFTG68itMJXxOqwgpjIOBUECBAkQJECQAEGCNx1gK0GbWX2VjREkQJCgRUGvEwQJECRAkABBglYEFW+V2McjGzUt3W9pfL0L2hBUemR0O/s+z+Cm5edOTa/X0Yag4u3axx9/O9+o6dJXOja8Xkcbggo3/F8+/hnU1V3TpS8FbXi9jjYEFR4Z3Z6FjQWuafm5U9PrdTQtqPyNsOlPYRv6jXpQ8Hod7Y5B9mvNB4OzTZpuNQYFr9fRzlms8Mgo7F/SNS0/d2p6vY4Wr4Pyrzbf5Dpo5blT4+tdwJW0AEECBAkQJECQAEGCaARNkiQ58E3m/t/fepb3dJmmiEXQxM7hfpcMVwIpp+YymxKJoOkoUzPu3SwnCMqYjvruxyRJu9PD29+Pk2T4kP7RTwXMfu3bX4feZZraskgEpUdXvo/T0VF6wPVuHo7T3pQeeLZ3WEHZr8nsNd8yTRGLoNkone73nR2Mnk7TbjHMjp2FIPtr/ppvmaaIR5Cx+9y7mWSfvc4Oq5Kg/NfsD98yTRGVoGzn83G6UpBnmaaIRFC+i/bwyS+GqgT5lmmKSASZsd1nO/hOR2n3SA3Mdz4dalYE+ZZpilgEZWN0diKzp/CDi4UMM06OlgX5lmlqu6IRFCsIEiBIgCABggQIEiBIgCABggQIEvwPFJYWEhHvk5oAAAAASUVORK5CYII=" /><!-- --></p>
-<p>The following example demonstrates how a calculated dictionary can be used for predicting the sentiment of out-of-sample data. In addition, the code then evaluates the prediction performance by comparing it to the built-in dictionaries.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>test_documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;This is neither good nor bad&quot;</span>,</span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;What a good idea!&quot;</span>,</span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Not bad&quot;</span>)</span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>test_response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(dict, test_documents)</span>
-<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a><span class="fu">compareToResponse</span>(pred, test_response)</span></code></pre></div>
+<p>The following example demonstrates how a calculated dictionary can be
+used for predicting the sentiment of out-of-sample data. In addition,
+the code then evaluates the prediction performance by comparing it to
+the built-in dictionaries.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>test_documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;This is neither good nor bad&quot;</span>,</span>
+<span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>                    <span class="st">&quot;What a good idea!&quot;</span>,</span>
+<span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a>                    <span class="st">&quot;Not bad&quot;</span>)</span>
+<span id="cb62-4"><a href="#cb62-4" tabindex="-1"></a>test_response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb62-5"><a href="#cb62-5" tabindex="-1"></a></span>
+<span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(dict, test_documents)</span>
+<span id="cb62-7"><a href="#cb62-7" tabindex="-1"></a></span>
+<span id="cb62-8"><a href="#cb62-8" tabindex="-1"></a><span class="fu">compareToResponse</span>(pred, test_response)</span></code></pre></div>
 <pre><code>##                              Dictionary
 ## cor                        5.922189e-05
 ## cor.t.statistic            5.922189e-05
@@ -649,12 +1010,13 @@ div.csl-indent {
 ## BalancedAccuracy                    NaN
 ## avg.sentiment.pos.response 1.457684e-05
 ## avg.sentiment.neg.response          NaN</code></pre>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSentimentResponse</span>(pred, test_response)</span></code></pre></div>
-<pre><code>## `geom_smooth()` using formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
-<pre><code>## Warning: Computation failed in `stat_smooth()`:
-## x has insufficient unique values to support 10 knots: reduce k.</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a><span class="fu">plotSentimentResponse</span>(pred, test_response)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre><code>## Warning: Computation failed in `stat_smooth()`
+## Caused by error in `smooth.construct.cr.smooth.spec()`:
+## ! x has insufficient unique values to support 10 knots: reduce k.</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compareToResponse</span>(<span class="fu">analyzeSentiment</span>(test_documents), test_response)</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" tabindex="-1"></a><span class="fu">compareToResponse</span>(<span class="fu">analyzeSentiment</span>(test_documents), test_response)</span></code></pre></div>
 <pre><code>## Warning in cor(sentiment, response): the standard deviation is zero</code></pre>
 <pre><code>## Warning in cor(x, y): the standard deviation is zero
 
@@ -731,49 +1093,59 @@ div.csl-indent {
 </div>
 <div id="configuration-of-preprocessing" class="section level2">
 <h2>Configuration of preprocessing</h2>
-<p>When desired, one can implement a tailored preprocessing stage that adapts to specific needs. The following code snippets demonstrate such adaptation. In particular, the <code>SentimentAnalysis</code> package ships a function <code>ngram_tokenize()</code> in order to extract -grams from the corpus. This does not affect the results of the built-in dictionaries but rather changes the features used as part of dictionary generation.</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">VCorpus</span>(<span class="fu">VectorSource</span>(documents))</span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>tdm <span class="ot">&lt;-</span> <span class="fu">TermDocumentMatrix</span>(corpus, </span>
-<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">control=</span><span class="fu">list</span>(<span class="at">wordLengths=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="cn">Inf</span>), </span>
-<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">tokenize=</span><span class="cf">function</span>(x) <span class="fu">ngram_tokenize</span>(x, <span class="at">char=</span><span class="cn">FALSE</span>, </span>
-<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>                                                                           <span class="at">ngmin=</span><span class="dv">1</span>, <span class="at">ngmax=</span><span class="dv">2</span>)))</span>
-<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tdm)</span></code></pre></div>
+<p>When desired, one can implement a tailored preprocessing stage that
+adapts to specific needs. The following code snippets demonstrate such
+adaptation. In particular, the <code>SentimentAnalysis</code> package
+ships a function <code>ngram_tokenize()</code> in order to extract
+-grams from the corpus. This does not affect the results of the built-in
+dictionaries but rather changes the features used as part of dictionary
+generation.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">VCorpus</span>(<span class="fu">VectorSource</span>(documents))</span>
+<span id="cb72-2"><a href="#cb72-2" tabindex="-1"></a>tdm <span class="ot">&lt;-</span> <span class="fu">TermDocumentMatrix</span>(corpus, </span>
+<span id="cb72-3"><a href="#cb72-3" tabindex="-1"></a>                          <span class="at">control=</span><span class="fu">list</span>(<span class="at">wordLengths=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="cn">Inf</span>), </span>
+<span id="cb72-4"><a href="#cb72-4" tabindex="-1"></a>                                       <span class="at">tokenize=</span><span class="cf">function</span>(x) <span class="fu">ngram_tokenize</span>(x, <span class="at">char=</span><span class="cn">FALSE</span>, </span>
+<span id="cb72-5"><a href="#cb72-5" tabindex="-1"></a>                                                                           <span class="at">ngmin=</span><span class="dv">1</span>, <span class="at">ngmax=</span><span class="dv">2</span>)))</span>
+<span id="cb72-6"><a href="#cb72-6" tabindex="-1"></a><span class="fu">rownames</span>(tdm)</span></code></pre></div>
 <pre><code>##  [1] &quot;a&quot;           &quot;a bad&quot;       &quot;a good&quot;      &quot;a very&quot;      &quot;bad&quot;        
 ##  [6] &quot;bad thing.&quot;  &quot;good&quot;        &quot;good thing!&quot; &quot;is&quot;          &quot;is a&quot;       
 ## [11] &quot;is okay.&quot;    &quot;okay.&quot;       &quot;thing!&quot;      &quot;thing.&quot;      &quot;this&quot;       
 ## [16] &quot;this is&quot;     &quot;very&quot;        &quot;very bad&quot;    &quot;very good&quot;</code></pre>
-<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">generateDictionary</span>(tdm, response)</span>
-<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dict)</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">generateDictionary</span>(tdm, response)</span>
+<span id="cb74-2"><a href="#cb74-2" tabindex="-1"></a><span class="fu">summary</span>(dict)</span></code></pre></div>
 <pre><code>## Dictionary type:  weighted (words with individual scores)
 ## Total entries:    7
-## Positive entries: 4 (57.14%)
-## Negative entries: 3 (42.86%)
+## Positive entries: 3 (42.86%)
+## Negative entries: 4 (57.14%)
 ## Neutral entries:  0 (0%)
 ## 
 ## Details
-## Average score:      5.814314e-06
-## Median:             1.602469e-16
-## Min:                -0.4372794
-## Max:                0.4381048
-## Standard deviation: 0.301723
-## Skewness:           0.00276835</code></pre>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>dict</span></code></pre></div>
+## Average score:      2.136424e-06
+## Median:             -5.891262e-05
+## Min:                -0.4368759
+## Max:                0.4380331
+## Standard deviation: 0.3016221
+## Skewness:           0.004124293</code></pre>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" tabindex="-1"></a>dict</span></code></pre></div>
 <pre><code>## Type: weighted (words with individual scores)
-## Intercept: -5.102483e-05
+## Intercept: -3.230431e-05
 ## -0.44 bad
 ## -0.29 very bad
+## -0.00 bad thing.
 ## -0.00 thing.
-##  0.00 thing!
 ##  0.00 good thing!
 ##  0.29 a good
 ##  0.44 good</code></pre>
 </div>
 <div id="performance-optimization" class="section level2">
 <h2>Performance optimization</h2>
-<p>Once the user has decided upon a preferred rule, he can adapt the <code>analyzeSentiment()</code> routine by restricting it to calculate only the rules of interest. Such behavior can be implemented by changing the default value of the argument <code>rules</code>. See the following code snippets for an example:</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents,</span>
-<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">rules=</span><span class="fu">list</span>(<span class="st">&quot;SentimentLM&quot;</span><span class="ot">=</span><span class="fu">list</span>(ruleSentiment, <span class="fu">loadDictionaryLM</span>())))</span>
-<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>sentiment</span></code></pre></div>
+<p>Once the user has decided upon a preferred rule, he can adapt the
+<code>analyzeSentiment()</code> routine by restricting it to calculate
+only the rules of interest. Such behavior can be implemented by changing
+the default value of the argument <code>rules</code>. See the following
+code snippets for an example:</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents,</span>
+<span id="cb78-2"><a href="#cb78-2" tabindex="-1"></a>                              <span class="at">rules=</span><span class="fu">list</span>(<span class="st">&quot;SentimentLM&quot;</span><span class="ot">=</span><span class="fu">list</span>(ruleSentiment, <span class="fu">loadDictionaryLM</span>())))</span>
+<span id="cb78-3"><a href="#cb78-3" tabindex="-1"></a>sentiment</span></code></pre></div>
 <pre><code>##   SentimentLM
 ## 1         0.5
 ## 2         0.5
@@ -783,140 +1155,214 @@ div.csl-indent {
 </div>
 <div id="language-support-and-extensibility" class="section level2">
 <h2>Language support and extensibility</h2>
-<p><code>SentimentAnalysis</code> can be adapted for use with languages other than English. In order to do this, one needs to introduce changes at two points:</p>
+<p><code>SentimentAnalysis</code> can be adapted for use with languages
+other than English. In order to do this, one needs to introduce changes
+at two points:</p>
 <ul>
-<li><p><strong>Preprocessing:</strong> The built-in routines use a parameter <code>language=&quot;english&quot;</code> to perform all preprocessing operations for the English language. Instead, one might prefer to change stemming and stopwords to a desired language. If one wishes to make further changes to the preprocessing, it might be beneficial to replace the automatic preprocessing with one’s own routines, which then return a <code>DocumentTermMatrix</code>.</p></li>
-<li><p><strong>Dictionary:</strong> If one has a response or baseline variable, one can use the dictionary generation approach that is shipped with <code>SentimentAnalysis</code>. This can then automatically generate a dictionary of positive and negative words that can be applied to the given language. Otherwise, if one has no baseline variable at hand, one needs to load a dictionary for that langauge. It might be worthwhile to search online for pre-defined lists of positive and negative words.</p></li>
+<li><p><strong>Preprocessing:</strong> The built-in routines use a
+parameter <code>language=&quot;english&quot;</code> to perform all preprocessing
+operations for the English language. Instead, one might prefer to change
+stemming and stopwords to a desired language. If one wishes to make
+further changes to the preprocessing, it might be beneficial to replace
+the automatic preprocessing with one’s own routines, which then return a
+<code>DocumentTermMatrix</code>.</p></li>
+<li><p><strong>Dictionary:</strong> If one has a response or baseline
+variable, one can use the dictionary generation approach that is shipped
+with <code>SentimentAnalysis</code>. This can then automatically
+generate a dictionary of positive and negative words that can be applied
+to the given language. Otherwise, if one has no baseline variable at
+hand, one needs to load a dictionary for that langauge. It might be
+worthwhile to search online for pre-defined lists of positive and
+negative words.</p></li>
 </ul>
-<p>The following example demonstrates how <code>SentimentAnalysis</code> can be adapted to work with a sample in German. Here, we supply a positive and negative document in the variable <code>documents</code>. Afterwards, we introduce a very small dictionary of positive and negative words, which is stored in <code>dictionaryGerman</code>. Finally, we use <code>analyzeSentiment()</code> to perform a sentiment analysis, where we introduce changes as follows: first of all, we supply <code>language=&quot;german&quot;</code> to ensure that all preprocessing operations are being made for the German language. Additionally, we define our custom rule for <code>GermanSentiment</code> that uses our previous, customized dictionary.</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Das ist ein gutes Resultat&quot;</span>,</span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;Das Ergebnis war schlecht&quot;</span>)</span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>dictionaryGerman <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryBinary</span>(<span class="fu">c</span>(<span class="st">&quot;gut&quot;</span>), </span>
-<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>                                              <span class="fu">c</span>(<span class="st">&quot;schlecht&quot;</span>))</span>
-<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents,</span>
-<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">language=</span><span class="st">&quot;german&quot;</span>,</span>
-<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>                              <span class="at">rules=</span><span class="fu">list</span>(<span class="st">&quot;GermanSentiment&quot;</span><span class="ot">=</span><span class="fu">list</span>(ruleSentiment, dictionaryGerman)))</span>
-<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>sentiment</span></code></pre></div>
+<p>The following example demonstrates how <code>SentimentAnalysis</code>
+can be adapted to work with a sample in German. Here, we supply a
+positive and negative document in the variable <code>documents</code>.
+Afterwards, we introduce a very small dictionary of positive and
+negative words, which is stored in <code>dictionaryGerman</code>.
+Finally, we use <code>analyzeSentiment()</code> to perform a sentiment
+analysis, where we introduce changes as follows: first of all, we supply
+<code>language=&quot;german&quot;</code> to ensure that all preprocessing
+operations are being made for the German language. Additionally, we
+define our custom rule for <code>GermanSentiment</code> that uses our
+previous, customized dictionary.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Das ist ein gutes Resultat&quot;</span>,</span>
+<span id="cb80-2"><a href="#cb80-2" tabindex="-1"></a>               <span class="st">&quot;Das Ergebnis war schlecht&quot;</span>)</span>
+<span id="cb80-3"><a href="#cb80-3" tabindex="-1"></a>dictionaryGerman <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryBinary</span>(<span class="fu">c</span>(<span class="st">&quot;gut&quot;</span>), </span>
+<span id="cb80-4"><a href="#cb80-4" tabindex="-1"></a>                                              <span class="fu">c</span>(<span class="st">&quot;schlecht&quot;</span>))</span>
+<span id="cb80-5"><a href="#cb80-5" tabindex="-1"></a></span>
+<span id="cb80-6"><a href="#cb80-6" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents,</span>
+<span id="cb80-7"><a href="#cb80-7" tabindex="-1"></a>                              <span class="at">language=</span><span class="st">&quot;german&quot;</span>,</span>
+<span id="cb80-8"><a href="#cb80-8" tabindex="-1"></a>                              <span class="at">rules=</span><span class="fu">list</span>(<span class="st">&quot;GermanSentiment&quot;</span><span class="ot">=</span><span class="fu">list</span>(ruleSentiment, dictionaryGerman)))</span>
+<span id="cb80-9"><a href="#cb80-9" tabindex="-1"></a>sentiment</span></code></pre></div>
 <pre><code>##   GermanSentiment
 ## 1             0.0
 ## 2            -0.5</code></pre>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToBinaryResponse</span>(sentiment<span class="sc">$</span>GermanSentiment)</span></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" tabindex="-1"></a><span class="fu">convertToBinaryResponse</span>(sentiment<span class="sc">$</span>GermanSentiment)</span></code></pre></div>
 <pre><code>## [1] positive negative
 ## Levels: negative positive</code></pre>
-<p>Similarly, one can implement a dictionary with custom sentiment scores.</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>woorden <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;goed&quot;</span>,<span class="st">&quot;slecht&quot;</span>)</span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.8</span>,<span class="sc">-</span><span class="fl">0.5</span>)</span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>dictionaryDutch <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryWeighted</span>(woorden, scores)</span>
-<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="st">&quot;dit is heel slecht&quot;</span></span>
-<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents,</span>
-<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">language=</span><span class="st">&quot;dutch&quot;</span>,</span>
-<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">rules=</span><span class="fu">list</span>(<span class="st">&quot;DutchSentiment&quot;</span><span class="ot">=</span><span class="fu">list</span>(ruleLinearModel, dictionaryDutch)))</span>
-<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a>sentiment</span></code></pre></div>
+<p>Similarly, one can implement a dictionary with custom sentiment
+scores.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" tabindex="-1"></a>woorden <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;goed&quot;</span>,<span class="st">&quot;slecht&quot;</span>)</span>
+<span id="cb84-2"><a href="#cb84-2" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.8</span>,<span class="sc">-</span><span class="fl">0.5</span>)</span>
+<span id="cb84-3"><a href="#cb84-3" tabindex="-1"></a>dictionaryDutch <span class="ot">&lt;-</span> <span class="fu">SentimentDictionaryWeighted</span>(woorden, scores)</span>
+<span id="cb84-4"><a href="#cb84-4" tabindex="-1"></a>documents <span class="ot">&lt;-</span> <span class="st">&quot;dit is heel slecht&quot;</span></span>
+<span id="cb84-5"><a href="#cb84-5" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(documents,</span>
+<span id="cb84-6"><a href="#cb84-6" tabindex="-1"></a>                              <span class="at">language=</span><span class="st">&quot;dutch&quot;</span>,</span>
+<span id="cb84-7"><a href="#cb84-7" tabindex="-1"></a>                              <span class="at">rules=</span><span class="fu">list</span>(<span class="st">&quot;DutchSentiment&quot;</span><span class="ot">=</span><span class="fu">list</span>(ruleLinearModel, dictionaryDutch)))</span>
+<span id="cb84-8"><a href="#cb84-8" tabindex="-1"></a>sentiment</span></code></pre></div>
 <pre><code>##   DutchSentiment
 ## 1           -0.5</code></pre>
 <p>Notes:</p>
 <ul>
-<li><p>The argument <code>rules</code> is a named list of approaches, where each entry specifies a combination of a rule and a dictionary.</p></li>
-<li><p>Caution is needed when working with stemming. The default routines of <code>SentimentAnalysis</code> automatically perform stemming. Therefore, it is necessary to included stemmed terms in the original dictionary. One can easily achieve such a conversion by calling <code>tm::stemDocument()</code>.</p></li>
+<li><p>The argument <code>rules</code> is a named list of approaches,
+where each entry specifies a combination of a rule and a
+dictionary.</p></li>
+<li><p>Caution is needed when working with stemming. The default
+routines of <code>SentimentAnalysis</code> automatically perform
+stemming. Therefore, it is necessary to included stemmed terms in the
+original dictionary. One can easily achieve such a conversion by calling
+<code>tm::stemDocument()</code>.</p></li>
 </ul>
 </div>
 </div>
 <div id="worked-examples" class="section level1">
 <h1>Worked examples</h1>
-<p>The following example shows the usage of <code>SentimentAnalysis</code> in an applied setting. More precisely, we utilize Reuters oil-related news from the <code>tm</code> package.</p>
-<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tm)</span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;crude&quot;</span>)</span>
-<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze sentiment</span></span>
-<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(crude)</span>
-<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Count positive and negative news releases</span></span>
-<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">convertToBinaryResponse</span>(sentiment<span class="sc">$</span>SentimentLM))</span></code></pre></div>
+<p>The following example shows the usage of
+<code>SentimentAnalysis</code> in an applied setting. More precisely, we
+utilize Reuters oil-related news from the <code>tm</code> package.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" tabindex="-1"></a><span class="fu">library</span>(tm)</span>
+<span id="cb86-2"><a href="#cb86-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;crude&quot;</span>)</span>
+<span id="cb86-3"><a href="#cb86-3" tabindex="-1"></a></span>
+<span id="cb86-4"><a href="#cb86-4" tabindex="-1"></a><span class="co"># Analyze sentiment</span></span>
+<span id="cb86-5"><a href="#cb86-5" tabindex="-1"></a>sentiment <span class="ot">&lt;-</span> <span class="fu">analyzeSentiment</span>(crude)</span>
+<span id="cb86-6"><a href="#cb86-6" tabindex="-1"></a></span>
+<span id="cb86-7"><a href="#cb86-7" tabindex="-1"></a><span class="co"># Count positive and negative news releases</span></span>
+<span id="cb86-8"><a href="#cb86-8" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">convertToBinaryResponse</span>(sentiment<span class="sc">$</span>SentimentLM))</span></code></pre></div>
 <pre><code>## 
 ## negative positive 
 ##       16        4</code></pre>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># News releases with highest and lowest sentiment</span></span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>crude[[<span class="fu">which.max</span>(sentiment<span class="sc">$</span>SentimentLM)]]<span class="sc">$</span>meta<span class="sc">$</span>heading</span></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" tabindex="-1"></a><span class="co"># News releases with highest and lowest sentiment</span></span>
+<span id="cb88-2"><a href="#cb88-2" tabindex="-1"></a>crude[[<span class="fu">which.max</span>(sentiment<span class="sc">$</span>SentimentLM)]]<span class="sc">$</span>meta<span class="sc">$</span>heading</span></code></pre></div>
 <pre><code>## [1] &quot;HOUSTON OIL &lt;HO&gt; RESERVES STUDY COMPLETED&quot;</code></pre>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>crude[[<span class="fu">which.min</span>(sentiment<span class="sc">$</span>SentimentLM)]]<span class="sc">$</span>meta<span class="sc">$</span>heading</span></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" tabindex="-1"></a>crude[[<span class="fu">which.min</span>(sentiment<span class="sc">$</span>SentimentLM)]]<span class="sc">$</span>meta<span class="sc">$</span>heading</span></code></pre></div>
 <pre><code>## [1] &quot;DIAMOND SHAMROCK (DIA) CUTS CRUDE PRICES&quot;</code></pre>
-<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View summary statistics of sentiment variable</span></span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sentiment<span class="sc">$</span>SentimentLM)</span></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" tabindex="-1"></a><span class="co"># View summary statistics of sentiment variable</span></span>
+<span id="cb92-2"><a href="#cb92-2" tabindex="-1"></a><span class="fu">summary</span>(sentiment<span class="sc">$</span>SentimentLM)</span></code></pre></div>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## -0.08772 -0.04366 -0.02341 -0.02953 -0.01375  0.00000</code></pre>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize distribution of standardized sentiment variable</span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">scale</span>(sentiment<span class="sc">$</span>SentimentLM))</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute cross-correlation </span></span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(sentiment[, <span class="fu">c</span>(<span class="st">&quot;SentimentLM&quot;</span>, <span class="st">&quot;SentimentHE&quot;</span>, <span class="st">&quot;SentimentQDAP&quot;</span>)])</span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" tabindex="-1"></a><span class="co"># Visualize distribution of standardized sentiment variable</span></span>
+<span id="cb94-2"><a href="#cb94-2" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">scale</span>(sentiment<span class="sc">$</span>SentimentLM))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" tabindex="-1"></a><span class="co"># Compute cross-correlation </span></span>
+<span id="cb95-2"><a href="#cb95-2" tabindex="-1"></a><span class="fu">cor</span>(sentiment[, <span class="fu">c</span>(<span class="st">&quot;SentimentLM&quot;</span>, <span class="st">&quot;SentimentHE&quot;</span>, <span class="st">&quot;SentimentQDAP&quot;</span>)])</span></code></pre></div>
 <pre><code>##               SentimentLM SentimentHE SentimentQDAP
 ## SentimentLM     1.0000000   0.2769878     0.4769730
 ## SentimentHE     0.2769878   1.0000000     0.6141075
 ## SentimentQDAP   0.4769730   0.6141075     1.0000000</code></pre>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co"># crude oil news between  1987-02-26 until 1987-03-02</span></span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>datetime <span class="ot">&lt;-</span> <span class="fu">do.call</span>(c, <span class="fu">lapply</span>(crude, <span class="cf">function</span>(x) x<span class="sc">$</span>meta<span class="sc">$</span>datetimestamp))</span>
-<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSentiment</span>(sentiment<span class="sc">$</span>SentimentLM)</span></code></pre></div>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" tabindex="-1"></a><span class="co"># crude oil news between  1987-02-26 until 1987-03-02</span></span>
+<span id="cb97-2"><a href="#cb97-2" tabindex="-1"></a>datetime <span class="ot">&lt;-</span> <span class="fu">do.call</span>(c, <span class="fu">lapply</span>(crude, <span class="cf">function</span>(x) x<span class="sc">$</span>meta<span class="sc">$</span>datetimestamp))</span>
+<span id="cb97-3"><a href="#cb97-3" tabindex="-1"></a></span>
+<span id="cb97-4"><a href="#cb97-4" tabindex="-1"></a><span class="fu">plotSentiment</span>(sentiment<span class="sc">$</span>SentimentLM)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSentiment</span>(sentiment<span class="sc">$</span>SentimentLM, <span class="at">x=</span>datetime, <span class="at">cumsum=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" tabindex="-1"></a><span class="fu">plotSentiment</span>(sentiment<span class="sc">$</span>SentimentLM, <span class="at">x=</span>datetime, <span class="at">cumsum=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="word-couting" class="section level1">
 <h1>Word couting</h1>
-<p><code>SentimentAnalysis</code> can also be used to count words with the help of <code>countWords()</code> in documents.</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="co"># count words (without stopwords)</span></span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="fu">countWords</span>(documents)</span></code></pre></div>
+<p><code>SentimentAnalysis</code> can also be used to count words with
+the help of <code>countWords()</code> in documents.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" tabindex="-1"></a><span class="co"># count words (without stopwords)</span></span>
+<span id="cb99-2"><a href="#cb99-2" tabindex="-1"></a><span class="fu">countWords</span>(documents)</span></code></pre></div>
 <pre><code>##   WordCount
 ## 1         3</code></pre>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co"># count all words (including stopwords)</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">countWords</span>(documents, <span class="at">removeStopwords=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" tabindex="-1"></a><span class="co"># count all words (including stopwords)</span></span>
+<span id="cb101-2"><a href="#cb101-2" tabindex="-1"></a><span class="fu">countWords</span>(documents, <span class="at">removeStopwords=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##   WordCount
 ## 1         4</code></pre>
-<p>Note: The package has a built-in rule <code>ruleWordCount()</code>, which is used for the “WordCount” column when calling <code>analyzeSentiment()</code>. However, the former is likely to return different results as it is subject to the preprocessing rules of <code>analyzeSentiment()</code>. By default, it removes stopwords, excludes words with equal or less than 3 letters and might apply a sparsity operation. Hence, one should always use <code>countWords()</code> when working with word counts.</p>
+<p>Note: The package has a built-in rule <code>ruleWordCount()</code>,
+which is used for the “WordCount” column when calling
+<code>analyzeSentiment()</code>. However, the former is likely to return
+different results as it is subject to the preprocessing rules of
+<code>analyzeSentiment()</code>. By default, it removes stopwords,
+excludes words with equal or less than 3 letters and might apply a
+sparsity operation. Hence, one should always use
+<code>countWords()</code> when working with word counts.</p>
 </div>
 <div id="outlook" class="section level1">
 <h1>Outlook</h1>
-<p>The current version leaves open avenues for further enhancement. In the future, we see the following items as being potentially subject to improvements:</p>
+<p>The current version leaves open avenues for further enhancement. In
+the future, we see the following items as being potentially subject to
+improvements:</p>
 <ul>
-<li><p><strong>Negations:</strong> We envision a generic negation rule object that can be injected to negate fixed windows or apply complex negation rules <span class="citation">(Pröllochs, Feuerriegel, and Neumann 2016)</span>.</p></li>
-<li><p><strong>Multi-language support:</strong> The current version has built-in dictionaries for the English language only. We think that the package would benefit greatly from support of further languages. In such a setup, one would not need to adapt the preprocessing routines, as the underlying <code>tm</code> package would already have support for further languages <span class="citation">(Feinerer, Hornik, and Meyer 2008)</span>. Instead, it would only be required that the user tailor the applied dictionaries.</p></li>
+<li><p><strong>Negations:</strong> We envision a generic negation rule
+object that can be injected to negate fixed windows or apply complex
+negation rules <span class="citation">(Pröllochs, Feuerriegel, and
+Neumann 2016)</span>.</p></li>
+<li><p><strong>Multi-language support:</strong> The current version has
+built-in dictionaries for the English language only. We think that the
+package would benefit greatly from support of further languages. In such
+a setup, one would not need to adapt the preprocessing routines, as the
+underlying <code>tm</code> package would already have support for
+further languages <span class="citation">(Feinerer, Hornik, and Meyer
+2008)</span>. Instead, it would only be required that the user tailor
+the applied dictionaries.</p></li>
 </ul>
-<p>We cordially invite everyone to contribute source code, dictionaries and further demos.</p>
+<p>We cordially invite everyone to contribute source code, dictionaries
+and further demos.</p>
 </div>
 <div id="license" class="section level1">
 <h1>License</h1>
-<p><strong>SentimentAnalysis</strong> is released under the <a href="https://opensource.org/licenses/MIT">MIT License</a> Copyright (c) 2021 Stefan Feuerriegel &amp; Nicolas Pröllochs</p>
+<p><strong>SentimentAnalysis</strong> is released under the <a href="https://opensource.org/license/mit/">MIT License</a> Copyright (c)
+2021 Stefan Feuerriegel &amp; Nicolas Pröllochs</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Feinerer.2008" class="csl-entry">
-Feinerer, Ingo, Kurt Hornik, and David Meyer. 2008. <span>“Text Mining Infrastructure in r.”</span> <em>Journal of Statistical Software</em> 25 (5): 1–54.
+Feinerer, Ingo, Kurt Hornik, and David Meyer. 2008. <span>“Text Mining
+Infrastructure in r.”</span> <em>Journal of Statistical Software</em> 25
+(5): 1–54.
 </div>
 <div id="ref-Henry.2008" class="csl-entry">
-Henry, Elaine. 2008. <span>“Are Investors Influenced by How Earnings Press Releases Are Written?”</span> <em>Journal of Business Communication</em> 45 (4): 363–407.
+Henry, Elaine. 2008. <span>“Are Investors Influenced by How Earnings
+Press Releases Are Written?”</span> <em>Journal of Business
+Communication</em> 45 (4): 363–407.
 </div>
 <div id="ref-Loughran.2011" class="csl-entry">
-Loughran, Tim, and Bill McDonald. 2011. <span>“When Is a Liability Not a Liability? Textual Analysis, Dictionaries, and 10-Ks.”</span> <em>Journal of Finance</em> 66 (1): 35–65.
+Loughran, Tim, and Bill McDonald. 2011. <span>“When Is a Liability Not a
+Liability? Textual Analysis, Dictionaries, and 10-Ks.”</span>
+<em>Journal of Finance</em> 66 (1): 35–65.
 </div>
 <div id="ref-Pang.2008" class="csl-entry">
-Pang, Bo, and Lillian Lee. 2008. <span>“Opinion Mining and Sentiment Analysis.”</span> <em>Foundations and Trends in Information Retrieval</em> 2 (1): 1–135. <a href="https://doi.org/10.1561/1500000011">https://doi.org/10.1561/1500000011</a>.
+Pang, Bo, and Lillian Lee. 2008. <span>“Opinion Mining and Sentiment
+Analysis.”</span> <em>Foundations and Trends in Information
+Retrieval</em> 2 (1): 1–135. <a href="https://doi.org/10.1561/1500000011">https://doi.org/10.1561/1500000011</a>.
 </div>
 <div id="ref-ECIS.2015" class="csl-entry">
-Pröllochs, Nicolas, Stefan Feuerriegel, and Dirk Neumann. 2015. <span>“Generating Domain-Specific Dictionaries Using Bayesian Learning.”</span> In <em>23rd European Conference on Information Systems (ECIS)</em>. M<span>ü</span>nster, Germany. <a href="https://doi.org/10.2139/ssrn.2522884">https://doi.org/10.2139/ssrn.2522884</a>.
+Pröllochs, Nicolas, Stefan Feuerriegel, and Dirk Neumann. 2015.
+<span>“Generating Domain-Specific Dictionaries Using Bayesian
+Learning.”</span> In <em>23rd European Conference on Information Systems
+(ECIS)</em>. M<span>ü</span>nster, Germany. <a href="https://doi.org/10.2139/ssrn.2522884">https://doi.org/10.2139/ssrn.2522884</a>.
 </div>
 <div id="ref-DSS.2016" class="csl-entry">
-———. 2016. <span>“Negation Scope Detection in Sentiment Analysis: Decision Support for News-Driven Trading.”</span> <em>Decision Support Systems</em>. <a href="https://doi.org/10.1016/j.dss.2016.05.009">https://doi.org/10.1016/j.dss.2016.05.009</a>.
+———. 2016. <span>“Negation Scope Detection in Sentiment Analysis:
+Decision Support for News-Driven Trading.”</span> <em>Decision Support
+Systems</em>. <a href="https://doi.org/10.1016/j.dss.2016.05.009">https://doi.org/10.1016/j.dss.2016.05.009</a>.
 </div>
 <div id="ref-PLOSONE.2018" class="csl-entry">
-———. 2018. <span>“Statistical Inferences for Polarity Identification in Natural Language.”</span> <em>PLOS ONE</em> 13: e209323. <a href="https://doi.org/10.1371/journal.pone.0209323">https://doi.org/10.1371/journal.pone.0209323</a>.
+———. 2018. <span>“Statistical Inferences for Polarity Identification in
+Natural Language.”</span> <em>PLOS ONE</em> 13: e209323. <a href="https://doi.org/10.1371/journal.pone.0209323">https://doi.org/10.1371/journal.pone.0209323</a>.
 </div>
 <div id="ref-Ravi.2015" class="csl-entry">
-Ravi, Kumar, and Vadlamani Ravi. 2015. <span>“A Survey on Opinion Mining and Sentiment Analysis: Tasks, Approaches and Applications.”</span> <em>Knowledge-Based Systems</em> 89: 14–46. <a href="https://doi.org/10.1016/j.knosys.2015.06.015">https://doi.org/10.1016/j.knosys.2015.06.015</a>.
+Ravi, Kumar, and Vadlamani Ravi. 2015. <span>“A Survey on Opinion Mining
+and Sentiment Analysis: Tasks, Approaches and Applications.”</span>
+<em>Knowledge-Based Systems</em> 89: 14–46. <a href="https://doi.org/10.1016/j.knosys.2015.06.015">https://doi.org/10.1016/j.knosys.2015.06.015</a>.
 </div>
 <div id="ref-Tetlock.2007" class="csl-entry">
-Tetlock, Paul C. 2007. <span>“Giving Content to Investor Sentiment: The Role of Media in the Stock Market.”</span> <em>Journal of Finance</em> 62 (3): 1139–68.
+Tetlock, Paul C. 2007. <span>“Giving Content to Investor Sentiment: The
+Role of Media in the Stock Market.”</span> <em>Journal of Finance</em>
+62 (3): 1139–68.
 </div>
 </div>
 </div>
